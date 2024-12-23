@@ -16,18 +16,18 @@ I've explicitly set ``AppendTargetFrameworkToOutputPath`` and ``AppendRuntimeIde
 Build output is ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``
 Obj folder location reflects this settnigs too ``./GenerateSelfSignedCertificate\obj\x64\Debug\net8.0``
 
-I've also explicitly specified multiple runtime indentifiers reflecting that I'd like my app working for both runtimes - ``win-x64`` and ``linux-x64``.
+I've also explicitly specified multiple runtime indentifiers reflecting that I'd like my app work for both runtimes - ``win-x64`` and ``linux-x64``.
 ```xml
 <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
 ```
 Now, it is possible to build and run the application on the same platform regardless if it is ``win-64`` or ``linux-x64`` form single folder - ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``
-```bash
+
+The runtimes folder is located in the build output folder, and the universal ``System.Security.Cryptography.ProtectedData.dll`` is placed in the root of the build output folder.
+```sh
 ls ./GenerateSelfSignedCertificate/x64/Debug/net8.0/
 GenerateSelfSignedCertificate            GenerateSelfSignedCertificate.dll  GenerateSelfSignedCertificate.runtimeconfig.json  runtimes
 GenerateSelfSignedCertificate.deps.json  GenerateSelfSignedCertificate.pdb  System.Security.Cryptography.ProtectedData.dll
 ```
-
-The runtimes folder is located in the build output folder, and the universal ``System.Security.Cryptography.ProtectedData.dll`` is placed in the root of the build output folder.
 
 I primarly use windows so i just build the app and run it. It works from ``/x64/Debug/net8.0`` folder even without publish.
 And I can just switch from windows to linux and do the same - just build and run and it works without publish.
@@ -36,16 +36,20 @@ There're 3 options how you can specify RID for you project:
 1. no RID in csproj
 2. single RID - ``<RuntimeIdentifier>win-x64</RuntimeIdentifier>``
 3. multiple RID - ``<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>``
-Honestly you don't need to specify RID in multuple form -option 2. It can be avoided cause option 1. and 3. equals.
-When no RID is specified or multiple RID specified .net pulls all available runtimes for you project and copies them into single build output folder.  deps.json file is orgonizae  correspondingly. *mention Radim and link to MS*
+Honestly you don't need to specify RID in multuple form -option 2. It can be avoided cause option 1. and 3. are equivalent.
+When no RID is specified or multiple RID specified .net pulls all available runtimes for you project and copies them into single build output folder.  deps.json file is orgonizae  correspondingly.
 [More details about assembly resolution](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md)
 [Assembly Resolution](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md#assembly-resolution)
 
 
 <details>
-<summary>cat .\GenerateSelfSignedCertificate\x64\Debug\net8.0\GenerateSelfSignedCertificate.deps.json</summary>
+<summary>GenerateSelfSignedCertificate.deps.json for multiple RIDs</summary>
 
+```sh
+cat .\GenerateSelfSignedCertificate\x64\Debug\net8.0\GenerateSelfSignedCertificate.deps.json
 ```
+
+```json
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v8.0",
@@ -99,11 +103,11 @@ When no RID is specified or multiple RID specified .net pulls all available runt
 </details>
 
 However if you specify single RuntimeIdentifier - option 2. the output structure will be different.
-``` bash
+
+```sh
 ls ./GenerateSelfSignedCertificate/x64/Debug/net8.0/
 linux-x64
-``
-``` bash
+
 ls .\GenerateSelfSignedCertificate\x64\Debug\net8.0\linux-x64\
 
     Directory: C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\x64\Debug\net8.0\linux-x64
@@ -119,8 +123,13 @@ Mode                 LastWriteTime         Length Name
 ```
 
 <details>
-<summary>cat .\GenerateSelfSignedCertificate\x64\Debug\net8.0\linux-x64\GenerateSelfSignedCertificate.deps.json</summary>
+<summary>GenerateSelfSignedCertificate.deps.json for single RID</summary>
+
+```sh
 cat .\GenerateSelfSignedCertificate\x64\Debug\net8.0\linux-x64\GenerateSelfSignedCertificate.deps.json
+```
+
+```json
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v8.0/linux-x64",
@@ -163,6 +172,7 @@ cat .\GenerateSelfSignedCertificate\x64\Debug\net8.0\linux-x64\GenerateSelfSigne
     }
   }
 }
+```
 </details>
 
 Our goal is to obtain binaries for both Windows and Linux.
