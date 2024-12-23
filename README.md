@@ -1,7 +1,7 @@
 # net_publish
 
 <h1>An example how to publish a project for windows and linux without restoring and rebuilding twice.</h1>
-
+<h2>Project and how it is configured.</h2>
 Let's consier a simple .net 8 console application which generates self signed certificate and writes public and private keys to standard ouput in PEM format.
 The apllication is crossplatform, it utulizes [System.Security.Cryptography.ProtectedData](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/6.0.0) nuget package and it can work on windows and on linux.
 
@@ -164,11 +164,12 @@ Mode                 LastWriteTime         Length Name
 ```
 </details>
 
+We can omit the details about the deps.json file and its content since all of our application's binaries are in the same folder.
 >A runtime configuration file is not required to successfully launch an application, but without it, all the dependent assemblies must be located within the same folder as the application.
 
-[More details about assembly resolution](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md),
-[Assembly Resolution](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md#assembly-resolution)
+[More details about assembly resolution here](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md) and [here](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md#assembly-resolution).
 
+<h2>Build and publish</h2>
 Our goal is to obtain binaries for both Windows and Linux.
 I have added two publish profiles, one for each runtime identifier (RID).
 Publishing helps us generate only the necessary binaries for the target runtime.
@@ -194,60 +195,25 @@ dotnet publish [--no-build] [--no-restore]
 
 The documentation seems to support our assumption. Microsoft allows building without restoring, and publishing without building and/or restoring.
 
---
-attempt to do that which does not work + output
---
+one restore + one  build + one publish works per RID
+So for 2 RIDs we need to do that twice
+``RID win-x64``
+``restore + build + publish works per RID``
+``RID linux-x64``
+``restore + build + publish works per RID``
 
-dotnet restore  .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj -v n
-Build succeeded.
-    0 Warning(s)
-    0 Error(s)
+What can be optimized ?
+Let's start with win-x64.
+How to publish w/out exta restore and w/out extra build ?
 
-dotnet build .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj -v n
-CoreCompile:
-Build succeeded.
-    0 Warning(s)
-    0 Error(s)
-
-if you run build twice msbuild optimizes it's work
-GenerateTargetFrameworkMonikerAttribute:
-       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
-       CoreGenerateAssemblyInfo:
-       Skipping target "CoreGenerateAssemblyInfo" because all output files are up-to-date with respect to the input files.
-       _GenerateSourceLinkFile:
-         Source Link file 'obj\x64\Debug\net8.0\GenerateSelfSignedCertificate.sourcelink.json' is up-to-date.
-       CoreCompile:
-       Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
-       _CreateAppHost:
-       Skipping target "_CreateAppHost" because all output files are up-to-date with respect to the input files.
-       _CopyOutOfDateSourceItemsToOutputDirectory:
-       Skipping target "_CopyOutOfDateSourceItemsToOutputDirectory" because all output files are up-to-date with respect to the input files.
-       GenerateBuildDependencyFile:
-       Skipping target "GenerateBuildDependencyFile" because all output files are up-to-date with respect to the input files.
-       GenerateBuildRuntimeConfigurationFiles:
-       Skipping target "GenerateBuildRuntimeConfigurationFiles" because all output files are up-to-date with respect to the input files.
-       CopyFilesToOutputDirectory:
-         GenerateSelfSignedCertificate -> C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\x64\Debug\net8.0\GenerateSelfS 
-         ignedCertificate.dll
-
-restore + build + publish works per RID
-so for 2 RID we need to do that twice
-RID win-x64
-restore + build + publish works per RID
-RID linux-x64
-restore + build + publish works per RID
-
-let's optimize
-let's start with win-x64
-how to publish w/out exta restore and w/out extra build ?
-
-this does not work
+```sh
 dotnet publish --no-restore --no-build .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj -p:publishprofile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml -c Debug -v n
 Build FAILED.
 
 C:\Program Files\dotnet\sdk\8.0.403\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Publish.targets(351,5): error MSB3030: Could not copy the file "obj\x64\Debug
        \net8.0\win-x64\GenerateSelfSignedCertificate.dll" because it was not found. [C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSigne
        dCertificate\GenerateSelfSignedCertificate.csproj]
+```
 
 We need to assist MSBuild by specifying the output directory for the build binaries because it uses the wrong one, as indicated by the error message.
 The problem is that dotnet publish simply does not support specifying an output directory.
@@ -257,32 +223,26 @@ This is merely the target location for our published binaries, whereas we need t
 So let's switch to MSBuild which allow that and much more.
 MSBuild allows publishing without build and restore as well -  ``/p:RestorePackages=false /p:NoBuild=true``
 
-CoreCompile: is called when /p:NoBuild=false
-CoreCompile: is skipped when /p:NoBuild=true
-
-that does not work too
-```bash
+```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml /p:OutDir=.\x64\Debug
-```
-```bash
+
 C:\Program Files\dotnet\sdk\8.0.403\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Publish.targets(351,5): error MSB3030: Could not copy the file "obj\x64\Debug\net8.0 
 \win-x64\GenerateSelfSignedCertificate.dll" because it was not found. [C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\G 
 enerateSelfSignedCertificate.csproj]
 ```
 
 That still does not work
-```bash
+```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml /p:OutDir=.\x64\Debug /p:AppendRuntimeIdentifierToOutputPath=false
-```
-```bash
+
 C:\Program Files\dotnet\sdk\8.0.403\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Publish.targets(351,5): error MSB3030: Could not copy the file "obj\x64\Debug\net8.0 
 \win-x64\GenerateSelfSignedCertificate.dll" because it was not found. [C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\G 
 enerateSelfSignedCertificate.csproj]
 ```
 
-msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false
+```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n
-``` bash
+
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/9/2024 11:15:27 PM.
 
@@ -306,16 +266,12 @@ Build succeeded.
 Time Elapsed 00:00:00.52
 ```
 
-As you can see no CoreCompile taget was called. Cimpilation was skipped.
-Ok we've just publish the app w/out restore and w/out build for windows.
-(or to way that differertly we restore nugets and build the app only once during the build itself not during publish)
+As you can see, the CoreCompile target was not called; the compilation was skipped. We’ve just published the app without restoring or building for Windows. (Or to put it differently, we restored NuGet packages and built the app only once during the build itself, not during the publish process.)
 
 Let's run publish for linux.
-```bash
+```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n
-```
 
-```bash
 Build FAILED.
 
 "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj" (publish target) (1) ->
@@ -337,7 +293,7 @@ By doing this, the apphost is not created for your executable, meaning you'll ne
 
 Let's disable apphost creation and run the previous command once again. Publishing for Linux now works as expected.
 
-```bash
+```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n  
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/13/2024 3:38:01 PM.
@@ -364,7 +320,7 @@ Time Elapsed 00:00:00.59
 However, the absence of apphost is not our desired solution. Let's delve a bit deeper. We have just demonstrated that apphost is the key obstacle preventing us from publishing for two different platforms using a single build and restore process. To address the apphost problem, we need to analyze the MSBuild output or the [binary log](https://learn.microsoft.com/en-us/visualstudio/msbuild/obtaining-build-logs-with-msbuild?view=vs-2022#save-a-binary-log).([msbuild binary log viewer](https://msbuildlog.com/)
 My teammate @Martin Balous were succefully reserached the problem and found out the msbuild target responsible for apphost creation.
 
-```bash
+```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /p:Configuration=Debug /t:ResolveFrameworkReferences;_CreateAppHost /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n                                           
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/13/2024 4:38:21 PM.
