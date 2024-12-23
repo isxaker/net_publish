@@ -98,12 +98,12 @@ When no RID is specified or multiple RID specified .net pulls all available runt
 ```
 </details>
 
-However if you specify single RuntimeIdentifier - option 2) the output structure will be different.
-```
+However if you specify single RuntimeIdentifier - option 2. the output structure will be different.
+``` bash
 ls ./GenerateSelfSignedCertificate/x64/Debug/net8.0/
 linux-x64
 ``
-```
+``` bash
 ls .\GenerateSelfSignedCertificate\x64\Debug\net8.0\linux-x64\
 
     Directory: C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\x64\Debug\net8.0\linux-x64
@@ -165,25 +165,30 @@ cat .\GenerateSelfSignedCertificate\x64\Debug\net8.0\linux-x64\GenerateSelfSigne
 }
 </details>
 
-Our goal is getting both windows and linux binaries.
-I've added 2 publish profiles one per RID.
-Publish would helps us to get only needed binaries for the target runtime.
-The usual or even proper workflow to get ready to use application is restornig nugets, building binaries and then publishing them.
-If we need out application to works on several runtimes we need to do all the steps twice.
-This is the most strighth fowrward approach - if appraoch works for one target we need to repeat the same steps for every other target.
-And this is correct,  everything will work. And it's even default behavior if you build\publish using VS UI.
+Our goal is to obtain binaries for both Windows and Linux.
+I have added two publish profiles, one for each runtime identifier (RID).
+Publishing helps us generate only the necessary binaries for the target runtime.
 
-However, two question we should ask ourselves:
-1) why we need build our application more than once if the code is crossplatform ?
-2) why we need to restore nugets more than once  if .net puts all binaries and runtimes folder into single build out folder during build for multiple RIDS why ? (assuming that MS allowed such a behaviour so it's supported)
+The usual or proper workflow to prepare a ready-to-use application involves restoring NuGet packages, building binaries, and then publishing them.
+If we need our application to work on multiple platforms, we must perform all these steps twice.
 
-Then let's look at dotnet build and dotnet publish cli documentation
+This is the most straightforward approach - if the process works for one target, we repeat the same steps for every other target.
+This approach is correct and ensures everything functions properly.
+It's even the default behavior when building and publishing using the Visual Studio UI.
+
+However, there are two questions we should ask ourselves:
+1. Why do we need to build our application more than once if the code is cross-platform?
+2. Why do we need to restore NuGet packages more than once if .NET consolidates all binaries and the runtimes folder into a single build output folder during builds for multiple RIDs? (Assuming that Microsoft has allowed such behavior, it should be supported.)
+
+Then let's look at dotnet build and dotnet publish cli documentation.
+```
 dotnet build [--no-restore]
 dotnet publish [--no-build] [--no-restore]
-https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
-https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build
+```
+[dotnet-publish](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish)
+[dotnet-build](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build)
 
-Documentation kind of strengthens our assumption. MS allows building without restore and publishing without building and/or without restore.
+The documentation seems to support our assumption. Microsoft allows building without restoring, and publishing without building and/or restoring.
 
 --
 attempt to do that which does not work + output
