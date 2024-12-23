@@ -397,8 +397,8 @@ after long time of reverse engineering the binary logs...
 
 Final commands
 --
-1) remove folders
-
+1) Remove folders
+```sh
 Remove-Item -Path .\GenerateSelfSignedCertificate\obj\, .\GenerateSelfSignedCertificate\x64\ -Recurse -Force
 ls .\GenerateSelfSignedCertificate\
 
@@ -410,9 +410,10 @@ d----           11/2/2024  6:43 PM                Properties
 -a---          12/13/2024  3:49 PM            966 GenerateSelfSignedCertificate.csproj
 -a---           9/13/2024 10:15 PM            334 GenerateSelfSignedCertificate.csproj.user
 -a---           11/2/2024  6:52 PM           1249 Program.cs
+```
 
-2) clean project
-
+2) Clean project
+```sh
 C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish>msbuild /t:clean .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj 
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/13/2024 5:29:37 PM.
@@ -428,8 +429,10 @@ Build succeeded.
     0 Error(s)
 
 Time Elapsed 00:00:00.50
+```
 
-3) restore
+3. Restore nuget packages
+```sh
 dotnet restore  .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj -v n
 Build started 12/13/2024 5:53:46 PM.
      1>Project "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj" on node 1 (Restore target(s)).
@@ -470,9 +473,10 @@ Build succeeded.
     0 Error(s)
 
 Time Elapsed 00:00:00.92
-                                      
+```
 
-4) build project
+4. Build project
+```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /p:Configuration=Debug
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/13/2024 5:20:17 PM.
@@ -505,8 +509,10 @@ Build succeeded.
     0 Error(s)
 
 Time Elapsed 00:00:00.78
+```
 
-5) publish windows
+5. Publish for Windows
+```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/13/2024 6:06:04 PM.
@@ -535,9 +541,14 @@ Build succeeded.
     0 Error(s)
 
 Time Elapsed 00:00:00.72
+```
 
-intermidiate step
- ls .\GenerateSelfSignedCertificate\obj\x64\Debug\net8.0\
+6. Create apphost for linux
+
+Only one apphost.exe wich is windows one
+
+```sh
+ls .\GenerateSelfSignedCertificate\obj\x64\Debug\net8.0\
 
     Directory: C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\obj\x64\Debug\net8.0
 
@@ -561,11 +572,10 @@ d----          12/13/2024  6:04 PM                win-x64
 -a---          12/13/2024  6:04 PM          11676 GenerateSelfSignedCertificate.pdb
 -a---          12/13/2024  6:04 PM            189 GenerateSelfSignedCertificate.sourcelink.json
 -a---          12/13/2024  6:06 PM            934 PublishOutputs.f16676fdf0.txt
+```
+Let's call MsBuild target for creating apphost for linux.
 
-only one apphost.exe wich is windows one
-
-6) create apphost for linux
-
+```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /p:Configuration=Debug /t:ResolveFrameworkReferences;_CreateAppHost /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/13/2024 6:07:53 PM.
@@ -589,8 +599,10 @@ Build succeeded.
     0 Error(s)
 
 Time Elapsed 00:00:00.75
+```
+Run ls one more time.
 
-run ls one more time
+```sh
 ls .\GenerateSelfSignedCertificate\obj\x64\Debug\net8.0\
 
     Directory: C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\obj\x64\Debug\net8.0
@@ -616,12 +628,13 @@ d----          12/13/2024  6:04 PM                win-x64
 -a---          12/13/2024  6:04 PM          11676 GenerateSelfSignedCertificate.pdb
 -a---          12/13/2024  6:04 PM            189 GenerateSelfSignedCertificate.sourcelink.json
 -a---          12/13/2024  6:06 PM            934 PublishOutputs.f16676fdf0.txt
+```
 
-now we have 2 apphost files inside the same folder
+Now we have 2 apphost files inside the same folder.
 
-7) publish linux
-
->msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n   
+7. Publish for Linux
+```sh
+msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n   
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/13/2024 6:09:39 PM.
 
@@ -652,9 +665,10 @@ Build succeeded.
     0 Error(s)
 
 Time Elapsed 00:00:00.59
+```
 
-8) let ensure that app works
-
+8. Let's ensure that the appliaction works on windons and on linux
+```sh
  .\GenerateSelfSignedCertificate\x64\Debug\publish_win\GenerateSelfSignedCertificate.exe      
 -----BEGIN RSA PUBLIC KEY-----
 MIIBCgKCAQEA3wfn3eeyGMhCKBXQsG5NTr+8CpjT8PtCR/DLjzXACO8W+LZU2jhe
@@ -692,8 +706,9 @@ aQbADFw9AoGADMObRPd7qCQyM64+V43R0I9pJQvEbYM37BFPilC9G8MBqWCbF9oz
 +Vzjmf8TFUYCTB22BLV5oX2W1ja36+YEv+UPLDaiEriSyKH6lF9q07payBVxvk7Y
 8vXoQwmjXw2hAou7lOlwbX03DRCAG6JLgEJNKlVI+k4nyNwl4wsJu/I=
 -----END RSA PRIVATE KEY-----
+```
 
-
+```sh
 user@PRG10086:/mnt/c/Users/mbryksin/Desktop/linkedIn/publish/Project/net_publish$ ./GenerateSelfSignedCertificate/x64/Debug/publish_linux/GenerateSelfSignedCertificate
 -----BEGIN RSA PUBLIC KEY-----
 MIIBCgKCAQEAv47bthtvbQRV35LNoq+9JPU0BQD1XnnclFysfwszFN426adDtGkq
@@ -731,8 +746,7 @@ LkavPr3XHacr6lDcqxhHIb5ExWSeX86L2fd5rxbz+mjG35V6fpr23dcLi+bLb0gl
 80s16Clpd14cGi/ca+xrVVUFPXHVAsbPvjM/KNhorB+94ndgFy75AreAl+NtvwOD
 HcuVvwhpyJQWUkUDhKGh5rSvPfh4z5Nf1dfD6rS3c3rE0ud6IQ==
 -----END RSA PRIVATE KEY-----
-
-
+```
 
 worth mentioning:
 --
