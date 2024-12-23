@@ -1,5 +1,3 @@
-# net_publish
-
 <h1>An example how to publish a project for windows and linux without restoring and rebuilding twice.</h1>
 <h2>Project and how it is configured.</h2>
 Let's consier a simple .net 8 console application which generates self signed certificate and writes public and private keys to standard ouput in PEM format.
@@ -355,8 +353,8 @@ after long time of reverse engineering the binary logs...
 
 
 
-Final commands
---
+<h2>Final commands:</h2>
+
 1) Remove folders
 ```sh
 Remove-Item -Path .\GenerateSelfSignedCertificate\obj\, .\GenerateSelfSignedCertificate\x64\ -Recurse -Force
@@ -708,7 +706,7 @@ HcuVvwhpyJQWUkUDhKGh5rSvPfh4z5Nf1dfD6rS3c3rE0ud6IQ==
 -----END RSA PRIVATE KEY-----
 ```
 
-worth mentioning:
---
+<h2>worth mentioning:</h2>
+
 1) The solution above works for entreprise comples solutions.
 2) Conditional compilation is out of scope of this article.
