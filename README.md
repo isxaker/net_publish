@@ -1,6 +1,7 @@
 <h1>An example how to publish a project for windows and linux without restoring and rebuilding twice.</h1>
 <h2>Project and how it is configured.</h2>
 Let's consier a simple .net 8 console application which generates self signed certificate and writes public and private keys to standard ouput in PEM format.
+
 The apllication is crossplatform, it utulizes [System.Security.Cryptography.ProtectedData](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/6.0.0) nuget package and it can work on windows and on linux.
 
 Let's look at ``.csproj`` file.
