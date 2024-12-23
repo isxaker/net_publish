@@ -238,39 +238,62 @@ let's start with win-x64
 how to publish w/out exta restore and w/out extra build ?
 
 this does not work
+<details>
+<summary>
 dotnet publish --no-restore --no-build .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj -p:publishprofile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml -c Debug -v n
+</summary>
 Build FAILED.
 
 C:\Program Files\dotnet\sdk\8.0.403\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Publish.targets(351,5): error MSB3030: Could not copy the file "obj\x64\Debug
        \net8.0\win-x64\GenerateSelfSignedCertificate.dll" because it was not found. [C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSigne
        dCertificate\GenerateSelfSignedCertificate.csproj]
+</details>
 
-we need to help msbuild by specifying output directory with build binaries cause it uses the wrong one
-which is obvious form the error message.
-the problem that dotnet publish simply does not support it
-it is possible to specify [-o|--output <OUTPUT_DIRECTORY>] for dotnet publish but it is not what we want.
-this is just a target location for our published binaries where we need to help dotnetms msbuild with source folder whitch contains build binaries.
-https://github.com/dotnet/sdk/issues/9012
-so let's switch to msbuild which allow that and much more.
-msbuild allows publishing without build and restore as well -  /p:RestorePackages=false /p:NoBuild=true
+We need to assist MSBuild by specifying the output directory for the build binaries because it uses the wrong one, as indicated by the error message.
+The problem is that dotnet publish simply does not support specifying an output directory.
+It is possible to specify ``[-o|--output <OUTPUT_DIRECTORY>]`` for dotnet publish but it is not what we want.
+This is merely the target location for our published binaries, whereas we need to assist MSBuild with specifying the source folder that contains the build binaries.
+[dotnet publish does not set OutDir - issue](https://github.com/dotnet/sdk/issues/9012)
+So let's switch to MSBuild which allow that and much more.
+MSBuild allows publishing without build and restore as well -  ``/p:RestorePackages=false /p:NoBuild=true``
 
 CoreCompile: is called when /p:NoBuild=false
 CoreCompile: is skipped when /p:NoBuild=true
 
+<details>
+that does not work too
+<summary>
+```bash
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml /p:OutDir=.\x64\Debug
-that does not work too
+```
+</summary>
+```bash
 C:\Program Files\dotnet\sdk\8.0.403\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Publish.targets(351,5): error MSB3030: Could not copy the file "obj\x64\Debug\net8.0 
 \win-x64\GenerateSelfSignedCertificate.dll" because it was not found. [C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\G 
 enerateSelfSignedCertificate.csproj]
+```
+</details>
 
+<details>
+That still does not work
+<summary>
+```bash
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml /p:OutDir=.\x64\Debug /p:AppendRuntimeIdentifierToOutputPath=false
-that does not work too
+```
+</summary>
+```bash
 C:\Program Files\dotnet\sdk\8.0.403\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Publish.targets(351,5): error MSB3030: Could not copy the file "obj\x64\Debug\net8.0 
 \win-x64\GenerateSelfSignedCertificate.dll" because it was not found. [C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\G 
 enerateSelfSignedCertificate.csproj]
+```
+</details>
 
+<details>
+<summary>
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n
+</summary>
+``` bash
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/9/2024 11:15:27 PM.
 
@@ -292,13 +315,18 @@ Build succeeded.
     0 Error(s)
 
 Time Elapsed 00:00:00.52
+```
+
 As you can see no CoreCompile taget was called. Cimpilation was skipped.
 Ok we've just publish the app w/out restore and w/out build for windows.
 (or to way that differertly we restore nugets and build the app only once during the build itself not during publish)
 
 Let's run publish for linux.
- msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n
+```bash
+msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n
+```
 
+```bash
 Build FAILED.
 
 "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj" (publish target) (1) ->
@@ -310,17 +338,17 @@ tificate.csproj]
     1 Error(s)
 
 Time Elapsed 00:00:00.77
+```
 
-We encountered the problem with apphost.
+We encountered an issue with apphost. In .NET Core 3.0 and later, when you publish an application, an executable file (apphost) is created by default. This feature provides a platform-specific binary that allows you to run your application without needing to specify dotnet and the DLL name, simplifying the launch process.
 
-And there 2 ways how it can be sokved.
-In .NET Core 3.0 and later, when you publish an application, an executable file (apphost) is created by default for convenience so that you can run your application without specifying dotnet and the DLL name. This feature creates a platform-specific binary that simplifies launching your application.
-If you want to disable the creation of the apphost and instead have the traditional approach of running your application using the dotnet command with your DLL, you can modify your project file (*.csproj) to achieve this.
-Disable apphost for our project adding <UseAppHost>false</UseAppHost> to csproj file.
-With this apphost is not created for our executable so you have to run the executable using dotnet which is not convineint and even my not be acceptable for some scenarious.
-Ppublish for linux now works as expected.
+If you prefer to disable the creation of the apphost and follow the traditional approach of running your application using the dotnet command with your DLL, you can adjust your project file (*.csproj) to do so. To disable apphost for your project, add <UseAppHost>false</UseAppHost> to the .csproj file.
 
---
+By doing this, the apphost is not created for your executable, meaning you'll need to run the executable using dotnet, which might not be convenient or even acceptable for certain scenarios.
+
+Let's disable apphost creation and run the previous command once again. Publishing for Linux now works as expected.
+
+```bash
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n  
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/13/2024 3:38:01 PM.
@@ -342,14 +370,12 @@ Build succeeded.
     0 Error(s)
 
 Time Elapsed 00:00:00.59
+```
 
-But lack of apphost is not our case. Let's go a bit deeper.
-We have just proved that apphost is the final problem which separates us from publishing for 2 different platforms using single build and restore.
-In order to takle the apphost problem we need to analyze msbuild ooutput or binary log.
-https://learn.microsoft.com/en-us/visualstudio/msbuild/obtaining-build-logs-with-msbuild?view=vs-2022#save-a-binary-log
-https://msbuildlog.com/
+However, the absence of apphost is not our desired solution. Let's delve a bit deeper. We have just demonstrated that apphost is the key obstacle preventing us from publishing for two different platforms using a single build and restore process. To address the apphost problem, we need to analyze the MSBuild output or the [binary log](https://learn.microsoft.com/en-us/visualstudio/msbuild/obtaining-build-logs-with-msbuild?view=vs-2022#save-a-binary-log).([msbuild binary log viewer](https://msbuildlog.com/)
 My teammate @Martin Balous were succefully reserached the problem and found out the msbuild target responsible for apphost creation.
 
+```bash
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /p:Configuration=Debug /t:ResolveFrameworkReferences;_CreateAppHost /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n                                           
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/13/2024 4:38:21 PM.
@@ -375,11 +401,12 @@ Build succeeded.
     0 Error(s)
 
 Time Elapsed 00:00:00.60
+```
 
 This what @Martin wrote to me:
 --
 after long time of reverse engineering the binary logs...
-![screenshot](imageFolder/apphost_investigation.png)
+![screenshot](./imageFolder/apphost_investigation.png)
 
 
 
@@ -387,9 +414,8 @@ Final commands
 --
 1) remove folders
 
-MBryksin ❯ Remove-Item -Path .\GenerateSelfSignedCertificate\obj\, .\GenerateSelfSignedCertificate\x64\ -Recurse -Force
-                                                                                                                                             net_publish   main ≡  ?1 ~2  
-MBryksin ❯ ls .\GenerateSelfSignedCertificate\
+Remove-Item -Path .\GenerateSelfSignedCertificate\obj\, .\GenerateSelfSignedCertificate\x64\ -Recurse -Force
+ls .\GenerateSelfSignedCertificate\
 
     Directory: C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate
 
@@ -400,30 +426,7 @@ d----           11/2/2024  6:43 PM                Properties
 -a---           9/13/2024 10:15 PM            334 GenerateSelfSignedCertificate.csproj.user
 -a---           11/2/2024  6:52 PM           1249 Program.cs
 
-rmdir /s /q .\GenerateSelfSignedCertificate\obj\ & rmdir /s /q .\GenerateSelfSignedCertificate\x64\
-tree /f .\GenerateSelfSignedCertificate 
-Folder PATH listing for volume Windows
-Volume serial number is CE37-B548
-C:\USERS\MBRYKSIN\DESKTOP\LINKEDIN\PUBLISH\PROJECT\NET_PUBLISH\GENERATESELFSIGNEDCERTIFICATE
-│   GenerateSelfSignedCertificate.csproj
-│   GenerateSelfSignedCertificate.csproj.user
-│   Program.cs
-│
-└───Properties
-    └───PublishProfiles
-            FolderProfile_linux.pubxml
-            FolderProfile_windows.pubxml
-
 2) clean project
-msbuild clean .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj
-MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
-MSBUILD : error MSB1008: Only one project can be specified.
-    Full command line: 'msbuild  clean .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj'
-  Switches appended by response files:
-'' came from 'C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\amd64\MSBuild.rsp'
-Switch: .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj
-
-For switch syntax, type "MSBuild -help"
 
 C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish>msbuild /t:clean .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj 
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
@@ -442,7 +445,7 @@ Build succeeded.
 Time Elapsed 00:00:00.50
 
 3) restore
-MBryksin ❯ dotnet restore  .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj -v n
+dotnet restore  .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj -v n
 Build started 12/13/2024 5:53:46 PM.
      1>Project "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj" on node 1 (Restore target(s)).
      1>_GetAllRestoreProjectPathItems:
@@ -750,25 +753,3 @@ worth mentioning:
 --
 1) The solution above works for entreprise comples solutions.
 2) Conditional compilation is out of scope of this article.
-
-
-**
-[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin", 'Machine')
-
-"terminal.integrated.defaultProfile.windows": "VSDev_PowerShell",
-"terminal.integrated.profiles.windows": {
-    "VsDevCmd (2022)": {
-        "path": [
-            "${env:windir}\\Sysnative\\cmd.exe",
-            "${env:windir}\\System32\\cmd.exe"
-        ],
-        "args": [
-            "/k",
-            "C:/Program Files/Microsoft Visual Studio/2022/Professional/Common7/Tools/VsDevCmd.bat",
-            "-arch=x64",
-            "-host_arch=x64"
-        ],
-        "overrideName": true,
-        "icon": "terminal-cmd"
-    },
-    //
