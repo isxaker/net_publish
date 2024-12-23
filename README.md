@@ -13,10 +13,10 @@ I've explicitly set ``AppendTargetFrameworkToOutputPath`` and ``AppendRuntimeIde
 <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
 <AppendRuntimeIdentifierToOutputPath>true</AppendRuntimeIdentifierToOutputPath>
 ```
-Build output is ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``
+Build output is ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``.
 Obj folder location reflects this settnigs too ``./GenerateSelfSignedCertificate\obj\x64\Debug\net8.0``
 
-I've also explicitly specified multiple runtime indentifiers reflecting that I'd like my app work for both runtimes - ``win-x64`` and ``linux-x64``.
+I've also explicitly specified multiple runtime indentifiers reflecting that I'd like my app works for both runtimes - ``win-x64`` and ``linux-x64``.
 ```xml
 <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
 ```
@@ -36,11 +36,8 @@ There're 3 options how you can specify RID for you project:
 1. no RID in csproj
 2. single RID - ``<RuntimeIdentifier>win-x64</RuntimeIdentifier>``
 3. multiple RID - ``<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>``
-Honestly you don't need to specify RID in multuple form -option 2. It can be avoided cause option 1. and 3. are equivalent.
-When no RID is specified or multiple RID specified .net pulls all available runtimes for you project and copies them into single build output folder.  deps.json file is orgonizae  correspondingly.
-[More details about assembly resolution](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md)
-[Assembly Resolution](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md#assembly-resolution)
-
+Honestly you don't need to specify RID in multuple form. It can be avoided cause option 1. and 3. are equivalent.
+When no RID is specified or multiple RID specified .net pulls all available runtimes for you project and copies them into single build output folder. deps.json file is organized correspondingly.
 
 <details>
 <summary>GenerateSelfSignedCertificate.deps.json for multiple RIDs</summary>
@@ -98,7 +95,7 @@ When no RID is specified or multiple RID specified .net pulls all available runt
 ```
 </details>
 
-However if you specify single RuntimeIdentifier - option 2. the output structure will be different.
+However if you specify single RuntimeIdentifier the output structure and deps.json file will be different.
 
 ```sh
 ls ./GenerateSelfSignedCertificate/x64/Debug/net8.0/
@@ -166,6 +163,11 @@ Mode                 LastWriteTime         Length Name
 }
 ```
 </details>
+
+>A runtime configuration file is not required to successfully launch an application, but without it, all the dependent assemblies must be located within the same folder as the application.
+
+[More details about assembly resolution](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md),
+[Assembly Resolution](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md#assembly-resolution)
 
 Our goal is to obtain binaries for both Windows and Linux.
 I have added two publish profiles, one for each runtime identifier (RID).
