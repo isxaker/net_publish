@@ -1,13 +1,14 @@
 # net_publish
-An example how to publish a project for windows and linux without restoring and rebuilding twice.
+
+<h1>An example how to publish a project for windows and linux without restoring and rebuilding twice.</h1>
 
 Let's consier a simple .net 8 console application which generates self signed certificate and writes public and private keys to standard ouput in PEM format.
-The apllication is crossplatform, it utulizes [System.Security.Cryptography.ProtectedData](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/6.0.0) nuget package and it can work on windown and on linux.
+The apllication is crossplatform, it utulizes [System.Security.Cryptography.ProtectedData](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/6.0.0) nuget package and it can work on windows and on linux.
 
-Let's look at .csproj file.
+Let's look at ``.csproj`` file.
 
-I've explicitly set ``AppendTargetFrameworkToOutputPath`` and ``AppendRuntimeIdentifierToOutputPath`` to true to mirror build output structure.
-```
+I've explicitly set ``AppendTargetFrameworkToOutputPath`` and ``AppendRuntimeIdentifierToOutputPath`` to ``true`` to mirror build output structure.
+```xml
 <OutputPath>$(Platform)\$(Configuration)</OutputPath>
 <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
 <AppendRuntimeIdentifierToOutputPath>true</AppendRuntimeIdentifierToOutputPath>
@@ -16,29 +17,29 @@ Build output is ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``
 Obj folder location reflects this settnigs too ``./GenerateSelfSignedCertificate\obj\x64\Debug\net8.0``
 
 I've also explicitly specified multiple runtime indentifiers reflecting that I'd like my app working for both runtimes - ``win-x64`` and ``linux-x64``.
-```
+```xml
 <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
 ```
 Now, it is possible to build and run the application on the same platform regardless if it is ``win-64`` or ``linux-x64`` form single folder - ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``
-```
+```bash
 ls ./GenerateSelfSignedCertificate/x64/Debug/net8.0/
 GenerateSelfSignedCertificate            GenerateSelfSignedCertificate.dll  GenerateSelfSignedCertificate.runtimeconfig.json  runtimes
 GenerateSelfSignedCertificate.deps.json  GenerateSelfSignedCertificate.pdb  System.Security.Cryptography.ProtectedData.dll
 ```
 
-``*runtimes`` folder is right here in build output folder + univeral ``System.Security.Cryptography.ProtectedData.dll`` is placed into root build output folder*
+The runtimes folder is located in the build output folder, and the universal ``System.Security.Cryptography.ProtectedData.dll`` is placed in the root of the build output folder.
 
 I primarly use windows so i just build the app and run it. It works from ``/x64/Debug/net8.0`` folder even without publish.
 And I can just switch from windows to linux and do the same - just build and run and it works without publish.
 
 There're 3 options how you can specify RID for you project:
-1) no RID in csproj
-2) single RID - ``<RuntimeIdentifier>win-x64</RuntimeIdentifier>``
-3) multiple RID - ``<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>``
-Honestly you don't need to specify RID in multuple form -option 2). It can be avoided cause option 1) and 3) equals.
+1. no RID in csproj
+2. single RID - ``<RuntimeIdentifier>win-x64</RuntimeIdentifier>``
+3. multiple RID - ``<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>``
+Honestly you don't need to specify RID in multuple form -option 2. It can be avoided cause option 1. and 3. equals.
 When no RID is specified or multiple RID specified .net pulls all available runtimes for you project and copies them into single build output folder.  deps.json file is orgonizae  correspondingly. *mention Radim and link to MS*
-[](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md)
-[](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md#assembly-resolution)
+[More details about assembly resolution](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md)
+[Assembly Resolution](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md#assembly-resolution)
 
 
 <details>
