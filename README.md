@@ -45,10 +45,6 @@ When no RID is specified or multiple RID specified .net pulls all available runt
 <details>
 <summary>GenerateSelfSignedCertificate.deps.json for multiple RIDs</summary>
 
-```sh
-cat .\GenerateSelfSignedCertificate\x64\Debug\net8.0\GenerateSelfSignedCertificate.deps.json
-```
-
 ```json
 {
   "runtimeTarget": {
@@ -124,10 +120,6 @@ Mode                 LastWriteTime         Length Name
 
 <details>
 <summary>GenerateSelfSignedCertificate.deps.json for single RID</summary>
-
-```sh
-cat .\GenerateSelfSignedCertificate\x64\Debug\net8.0\linux-x64\GenerateSelfSignedCertificate.deps.json
-```
 
 ```json
 {
