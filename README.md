@@ -1,24 +1,25 @@
-<h1>An example how to publish a project for windows and linux without restoring and rebuilding twice.</h1>
-<h2>Project and how it is configured.</h2>
+<h1>How to publish a project for Windows and Linux, using a single restore and build operation.</h1>
+<h2>The project and how it is configured.</h2>
 
-Let's consier a simple .net 8 console application which generates self signed certificate and writes public and private keys to standard ouput in PEM format. 
-The apllication is crossplatform, it utulizes [System.Security.Cryptography.ProtectedData](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/6.0.0) nuget package and it can work on windows and on linux.
+Let's consider a simple .NET 8 console application that generates a self-signed certificate and writes the public and private keys to standard output in PEM format.
 
-Let's look at couple important parts of ``.csproj`` file.
+The application is cross-platform, it utilizes the, it utulizes [System.Security.Cryptography.ProtectedData](https://www.nuget.org/packages/System.Security.Cryptogr
+
+Let's look at couple of important parts of ``.csproj`` file.
 
 I've explicitly set ``AppendTargetFrameworkToOutputPath`` and ``AppendRuntimeIdentifierToOutputPath`` to ``true`` to mirror build output structure.
-And I've also explicitly specified multiple runtime indentifiers reflecting that I'd like my app works for both runtimes - ``win-x64`` and ``linux-x64``.
+I've also explicitly specified multiple runtime indentifiers reflecting that I'd like my app to work on both runtimes - ``win-x64`` and ``linux-x64``.
 ```xml
 <OutputPath>$(Platform)\$(Configuration)</OutputPath>
 <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
 <AppendRuntimeIdentifierToOutputPath>true</AppendRuntimeIdentifierToOutputPath>
 <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
 ```
-Build output is ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``.
+Build output folder is ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``.
 Obj folder location reflects this settnigs too ``./GenerateSelfSignedCertificate\obj\x64\Debug\net8.0``
-Now, it is possible to build and run the application on the same platform regardless if it is ``win-64`` or ``linux-x64`` from single folder - ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``
+Now, it is possible to build and run the application on the same platform — whether ``win-64`` or ``linux-x64`` — from a single folder - ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``
 
-The runtimes folder is located in the build output folder, and the universal ``System.Security.Cryptography.ProtectedData.dll`` is placed in the root of the build output folder.
+The runtimes folder is located in the build output directory, and the universal ``System.Security.Cryptography.ProtectedData.dll`` is placed in the root of the build output folder.
 ```sh
 ls ./GenerateSelfSignedCertificate/x64/Debug/net8.0/
 GenerateSelfSignedCertificate            GenerateSelfSignedCertificate.dll  GenerateSelfSignedCertificate.runtimeconfig.json  runtimes
