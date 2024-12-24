@@ -4,7 +4,7 @@ Let's consier a simple .net 8 console application which generates self signed ce
 
 The apllication is crossplatform, it utulizes [System.Security.Cryptography.ProtectedData](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/6.0.0) nuget package and it can work on windows and on linux.
 
-Let's look at ``.csproj`` file.
+Let's look at couple important parts of ``.csproj`` file.
 
 I've explicitly set ``AppendTargetFrameworkToOutputPath`` and ``AppendRuntimeIdentifierToOutputPath`` to ``true`` to mirror build output structure.
 ```xml
