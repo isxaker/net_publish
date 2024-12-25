@@ -27,13 +27,13 @@ internal class Program
 
     private static string GetRSAPublickKeyPem(X509Certificate2 cert)
     {
-        RSA publicKey = cert.GetRSAPublicKey();
+        using RSA publicKey = cert.GetRSAPublicKey();
         return publicKey.ExportRSAPublicKeyPem();
     }
 
     private static string GetRSAPrivateKeyPem(X509Certificate2 cert)
     {
-        RSA privateKey = cert.GetRSAPrivateKey();
+        using RSA privateKey = cert.GetRSAPrivateKey();
         return privateKey.ExportRSAPrivateKeyPem();
     }
 }
