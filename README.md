@@ -311,7 +311,7 @@ Time Elapsed 00:00:00.52
 Perfect, now it works!
 As you can see, the ``CoreCompile`` target was not called; the compilation was skipped. We’ve just published the app without restoring Nuget packages and without building during publish (Or to put it differently, we restored ``NuGet`` packages and then built the app only once during the build itself, not during the publish process).
 
-#AppHost
+##AppHost
 Let's run publish for Linux.
 ```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n
