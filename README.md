@@ -905,7 +905,7 @@ HcuVvwhpyJQWUkUDhKGh5rSvPfh4z5Nf1dfD6rS3c3rE0ud6IQ==
 -----END RSA PRIVATE KEY-----
 ```
 
-<h2>worth mentioning.</h2>
+<h2>worth mentioning:</h2>
 
 1. The solution above works for complex enterprise solutions.
 2. Conditional compilation is out of scope of this article.
