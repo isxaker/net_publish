@@ -256,7 +256,6 @@ dotnet build [--no-restore]
 dotnet publish [--no-build] [--no-restore]
 ```
 [dotnet-publish](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish)
-<br / >
 [dotnet-build](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build)
 
 The documentation seems to support our assumption. Microsoft allows building without restoring, and publishing without building and/or restoring.
