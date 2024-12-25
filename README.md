@@ -1,14 +1,17 @@
 <h1>How to publish a project for Windows and Linux, using a single restore and build operation.</h1>
+
+In this article, I'd like to share how to publish a cross-platform .NET 8 application to both Windows and Linux using a single NuGet restore and a single build operation. I have not found any similar guides, so everything below is the result of my own research and that of my teammates. The final solution works and is being used in more complex applications than the one presented here. Any feedback is more than welcome.
+
 <h2>The project and how it is configured.</h2>
 
 Let's consider a simple .NET 8 console application that generates a self-signed certificate and writes the public and private keys to standard output in PEM format.
 
-The application is cross-platform, it utilizes the, it utulizes [System.Security.Cryptography.ProtectedData](https://www.nuget.org/packages/System.Security.Cryptogr
+The application is cross-platform, it utilizes the, it utilizes [System.Security.Cryptography.ProtectedData](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/6.0.0)
 
 Let's look at couple of important parts of ``.csproj`` file.
 
 I've explicitly set ``AppendTargetFrameworkToOutputPath`` and ``AppendRuntimeIdentifierToOutputPath`` to ``true`` to mirror build output structure.
-I've also explicitly specified multiple runtime indentifiers reflecting that I'd like my app to work on both runtimes - ``win-x64`` and ``linux-x64``.
+I've also explicitly specified multiple runtime identifiers reflecting that I'd like my app to work on both runtimes - ``win-x64`` and ``linux-x64``.
 ```xml
 <OutputPath>$(Platform)\$(Configuration)</OutputPath>
 <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
@@ -16,7 +19,7 @@ I've also explicitly specified multiple runtime indentifiers reflecting that I'd
 <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
 ```
 Build output folder is ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``.
-Obj folder location reflects this settnigs too ``./GenerateSelfSignedCertificate\obj\x64\Debug\net8.0``
+Obj folder location reflects these settings too ``./GenerateSelfSignedCertificate\obj\x64\Debug\net8.0``
 Now, it is possible to build and run the application on the same platform — whether ``win-64`` or ``linux-x64`` — from a single folder - ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``
 
 The runtimes folder is located in the build output directory, and the universal ``System.Security.Cryptography.ProtectedData.dll`` is placed in the root of the build output folder.
@@ -26,16 +29,14 @@ GenerateSelfSignedCertificate            GenerateSelfSignedCertificate.dll  Gene
 GenerateSelfSignedCertificate.deps.json  GenerateSelfSignedCertificate.pdb  System.Security.Cryptography.ProtectedData.dll
 ```
 
-There're 3 options how you can specify RID for you project:
-1. no RID in csproj
-2. single RID - ``<RuntimeIdentifier>win-x64</RuntimeIdentifier>``
-3. multiple RID - ``<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>``
-Honestly you don't need to specify RID in multuple form. It can be avoided cause option 1. and 3. are equivalent.
-When no RID is specified or multiple RID specified .net pulls all available runtimes for you project and copies them into single build output folder.
-*.deps.json file is organized correspondingly.
+There're 3 options for specifying ``RID`` for you project:
+1. no ``RID`` in ``csproj``
+2. single ``RID`` - ``<RuntimeIdentifier>win-x64</RuntimeIdentifier>``
+3. multiple ``RID`` - ``<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>``
+Honestly, you don't need to specify `RIDs` in multiple form because options 1 and 3 are equivalent. When no `RID` is specified or multiple `RIDs` are specified, .NET pulls all available runtimes for your project and copies them into a single build output folder. The `.deps.json` file is organized accordingly.
 
 <details>
-<summary>GenerateSelfSignedCertificate.deps.json for multiple RIDs</summary>
+<summary>``GenerateSelfSignedCertificate.deps.json`` for multiple ``RIDs``</summary>
 
 ```json
 {
@@ -90,7 +91,7 @@ When no RID is specified or multiple RID specified .net pulls all available runt
 ```
 </details>
 
-However if you specify single RuntimeIdentifier the output structure and deps.json file will be different.
+However, if you specify single ``RID`` the output structure and ``deps.json`` file will be different.
 
 ```sh
 ls ./GenerateSelfSignedCertificate/x64/Debug/net8.0/
@@ -111,7 +112,7 @@ Mode                 LastWriteTime         Length Name
 ```
 
 <details>
-<summary>GenerateSelfSignedCertificate.deps.json for single RID</summary>
+<summary>``GenerateSelfSignedCertificate.deps.json`` for single ``RID``</summary>
 
 ```json
 {
@@ -159,18 +160,17 @@ Mode                 LastWriteTime         Length Name
 ```
 </details>
 
-We can omit the details about the deps.json file and its content since all of our application's binaries are in the same folder.
+We can omit the details about the ``deps.json`` file and its content since all of our application's binaries are in the same folder.
 >A runtime configuration file is not required to successfully launch an application, but without it, all the dependent assemblies must be located within the same folder as the application.
 
 More details about assembly resolution [here](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md) and [here](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md#assembly-resolution).
 
-I primarly use windows so i just build the app and run it. It works from ``/x64/Debug/net8.0`` folder even without publish.
-And I can just switch from windows to linux and do the same - just build and run and it works without publish.
+I primarily use Windows so I just build the app and run it. It works from ``/x64/Debug/net8.0`` folder even without publish.
+And I can just switch from Windows to Linux and do the same - just build and run the application, it works without publish.
 
 <h2>Build and publish</h2>
 
-Our goal is to obtain binaries for both Windows and Linux.
-I have added two publish profiles, one for each RID.
+Our goal is to obtain binaries for both Windows and Linux. I have added two publish profiles, one for each ``RID``.
 
 ```sh
 tree /f .\GenerateSelfSignedCertificate 
@@ -187,16 +187,16 @@ C:\USERS\MBRYKSIN\DESKTOP\LINKEDIN\PUBLISH\PROJECT\NET_PUBLISH\GENERATESELFSIGNE
             FolderProfile_windows.pubxml
 ```
 
-Publishing helps us generate only the necessary binaries for the target runtime.
+Publishing helps generate only the necessary binaries for the target runtime.
 
 The usual or proper workflow to prepare a ready-to-use application involves restoring NuGet packages, building binaries, and then publishing them.
-If we need our application to work on multiple platforms, we must perform all these steps twice.
+If we need our application to work on multiple platforms, we must perform all these steps twice - once for each platform.
 
-This is the most straightforward approach - if the process works for one target, we repeat the same steps for every other target.
+This is the most straightforward approach: if the process works for one ``RID``, we repeat the same steps for every other ``RIDs``.
 This approach is correct and ensures everything functions properly.
 It's even the default behavior when building and publishing using the Visual Studio UI.
 
-These are the commands used for succeful publising the application for windows and linux.
+These are the commands used for successful publishing the application for Windows and Linux.
 
 ```sh
 dotnet restore  .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj -v n
@@ -205,12 +205,14 @@ dotnet publish .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csp
 dotnet publish .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj -p:publishprofile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml -c Debug -v n
 ```
 
-Howerver, if you go through the MsBuild detaild output you would notice that ``Restore`` and ``CoreCompile`` targets are called 3 times - one for dotnet build, one for dotnet publish windows and one more for dotnet publish linux.
+However, if you examine the detailed ``MsBuild`` output for the command above, you will notice that ``Restore`` and ``CoreCompile`` targets are called 3 times - one for ``dotnet build``, one for ``dotnet publish`` for Windows and one more for ``dotnet publish`` for Linux.
 There are two questions we should ask ourselves:
 1. Why do we need to build our application more than once if the code is cross-platform?
-2. Why do we need to restore NuGet packages more than once if .NET consolidates all binaries and the runtimes folder into a single build output folder during builds for multiple RIDs? (Assuming that Microsoft has allowed such behavior, it should be supported)
+2. Why do we need to restore NuGet packages more than once if .NET consolidates all binaries and the runtimes folder into a single build output folder during builds for multiple ``RIDs``? (Assuming that Microsoft has allowed such behavior, it should be correct and supported)
 
-MsBuild is smart enough and if e.g. you run dotnet build 2 times in row multiple targets if not all of them will be skipped.
+The assumption is that if the code is cross-platform, it can be built only once; hence, only a single NuGet restore is needed.
+
+``MsBuild`` is smart enough and if e.g. you run ``dotnet build`` 2 times in a row, multiple targets - if not all of them - will be skipped.
 Below is the output for the second build in a row for out project.
 ```sh
 dotnet build .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj --no-restore  -v n
@@ -242,19 +244,23 @@ Build succeeded.
 
 Time Elapsed 00:00:00.56
 ```
-For some reason for 2 different publishing ``Restore`` and ``CoreCompile`` targrets  are called twice - one time per publish profile.
-In total ``Restore`` and ``CoreCompile`` targets are called 3 times - build\publish windoes\publish linux.
 
-Let's look at dotnet build and dotnet publish cli documentation.
+As you can see ``CoreCompile`` target - the target responsible for compiling the source code files in a project - skipped cause the application is already compiled and no changes are needed.
+
+However, when the application is being published for 2 different ``RIDs`` ``Restore`` and ``CoreCompile`` targets are called twice - once per publish profile.
+In total ``Restore`` and ``CoreCompile`` targets are called 3 times - build\publish Windows\publish Linux.
+
+Let's look at ``dotnet build`` and ``dotnet publish`` cli documentation.
 ```
 dotnet build [--no-restore]
 dotnet publish [--no-build] [--no-restore]
 ```
 [dotnet-publish](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish)
+<br / >
 [dotnet-build](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build)
 
 The documentation seems to support our assumption. Microsoft allows building without restoring, and publishing without building and/or restoring.
-How to publish w/out exta restore and w/out extra build ? Let's try dotnet publish first.
+How to publish without exta restore and without extra build? Let's try ``dotnet publish`` first.
 
 ```sh
 dotnet publish --no-restore --no-build .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj -p:publishprofile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml -c Debug -v n
@@ -265,13 +271,13 @@ C:\Program Files\dotnet\sdk\8.0.403\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET
        dCertificate\GenerateSelfSignedCertificate.csproj]
 ```
 
-We need to assist MSBuild by specifying the output directory for the build binaries because it uses the wrong one, as indicated by the error message.
-The problem is that dotnet publish simply does not support specifying an output directory.
-It is possible to specify ``[-o|--output <OUTPUT_DIRECTORY>]`` for dotnet publish but it is not what we want.
-This is merely the target location for our published binaries, whereas we need to assist MSBuild with specifying the source folder that contains the build binaries.
+We need to assist ``MSBuild`` by specifying the output directory for the build binaries because it uses the wrong one, as indicated by the error message.
+The problem is that ``dotnet publish`` simply does not support specifying an output directory.
+It is possible to specify ``[-o|--output <OUTPUT_DIRECTORY>]`` for `dotnet publish`` but it is not what we want.
+This is merely the target location for our published binaries, whereas we need to assist ``MSBuild`` with specifying the source folder that contains the build binaries.
 [dotnet publish does not set OutDir - issue](https://github.com/dotnet/sdk/issues/9012)
-So let's switch to MSBuild which allow that and much more.
-MSBuild allows publishing without build and restore as well -  ``/p:RestorePackages=false /p:NoBuild=true``
+So let's switch to ``MSBuild`` which allow that and much more.
+``MSBuild`` allows publishing without build and restore as well -  ``/p:RestorePackages=false /p:NoBuild=true``
 
 ```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml /p:OutDir=.\x64\Debug
@@ -281,8 +287,8 @@ C:\Program Files\dotnet\sdk\8.0.403\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET
 enerateSelfSignedCertificate.csproj]
 ```
 
-That still does not work. OutDir value is wrong.
-
+That still does not work. ``OutDir`` value is wrong.
+Let's try to fix it.
 ```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml /p:OutDir=.\x64\Debug /p:AppendRuntimeIdentifierToOutputPath=false
 
@@ -290,9 +296,9 @@ C:\Program Files\dotnet\sdk\8.0.403\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET
 \win-x64\GenerateSelfSignedCertificate.dll" because it was not found. [C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\G 
 enerateSelfSignedCertificate.csproj]
 ```
-Again it does not work, OutDir is still wrong.
+It does not work again, ``OutDir`` is still wrong.
+Let's make one more attempt and correct ``OutDir`` looking at the error message.
 
-Let's make one more attempt and correct OutDir looking at the error message.
 ```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n
 
@@ -319,10 +325,10 @@ Build succeeded.
 Time Elapsed 00:00:00.52
 ```
 
-Perfect now it works!
-As you can see, the CoreCompile target was not called; the compilation was skipped. We’ve just published the app without restoring or building for Windows. (Or to put it differently, we restored NuGet packages and then built the app only once during the build itself, not during the publish process.)
+Perfect, now it works!
+As you can see, the ``CoreCompile`` target was not called; the compilation was skipped. We’ve just published the app without restoring Nuget packages and without building during publish. (Or to put it differently, we restored NuGet packages and then built the app only once during the build itself, not during the publish process)
 
-Let's run publish for linux.
+Let's run publish for Linux.
 ```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n
 
@@ -339,13 +345,13 @@ tificate.csproj]
 Time Elapsed 00:00:00.77
 ```
 
-We encountered an issue with apphost. In .NET Core 3.0 and later, when you publish an application, an executable file (apphost) is created by default. This feature provides a platform-specific binary that allows you to run your application without needing to specify dotnet and the DLL name, simplifying the launch process.
+We encountered an issue with ``apphost``. In .NET Core 3.0 and later, when you publish an application, an executable file - ``apphost`` - is created by default. This feature provides a platform-specific binary that allows you to run your application without needing to specify ``dotnet`` and the DLL name, simplifying the launch process.
 
-If you prefer to disable the creation of the apphost and follow the traditional approach of running your application using the dotnet command with your DLL, you can adjust your project file (*.csproj) to do so. To disable apphost for your project, add <UseAppHost>false</UseAppHost> to the .csproj file.
+If you prefer to disable the creation of the ``apphost`` and follow the traditional approach of running your application using the ``dotnet`` command with your DLL, you can adjust your ``.csproj`` to do so. To disable ``apphost`` for your project, add ``<UseAppHost>false</UseAppHost>`` to the ``.csproj`` file.
 
-By doing this, the apphost is not created for your executable, meaning you'll need to run the executable using dotnet, which might not be convenient or even acceptable for certain scenarios.
+By doing this, the ``apphost`` is not created for your executable, meaning you'll need to run the executable using ``dotnet``, which might not be convenient or even acceptable for certain scenarios.
 
-Let's disable apphost creation and run the previous command once again. Publishing for Linux now works as expected.
+Let's disable ``apphost`` creation and run the previous command once again.
 
 ```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n  
@@ -370,9 +376,10 @@ Build succeeded.
 
 Time Elapsed 00:00:00.59
 ```
+Publishing for Linux now works as expected.
 
-However, the absence of apphost is not our desired solution. Let's delve a bit deeper. We have just demonstrated that apphost is the key obstacle preventing us from publishing for two different platforms using a single build and restore process. To address the apphost problem, we need to analyze the MSBuild output or the [binary log](https://learn.microsoft.com/en-us/visualstudio/msbuild/obtaining-build-logs-with-msbuild?view=vs-2022#save-a-binary-log)([msbuild binary log viewer](https://msbuildlog.com/)).
-My teammate @Martin_Balous were succefully reserached the problem and found out the msbuild target responsible for apphost creation. They are ``ResolveFrameworkReferences`` and ``_CreateAppHos``.
+However, the absence of ``apphost`` is not our desired solution. Let's delve a bit deeper. We have just demonstrated that ``apphost`` is the key obstacle preventing us from publishing for two different platforms using a single build and restore process. To address the ``apphost`` problem, we need to analyze the ``MSBuild`` output or the [binary log](https://learn.microsoft.com/en-us/visualstudio/msbuild/obtaining-build-logs-with-msbuild?view=vs-2022#save-a-binary-log)([MsBuild binary log viewer](https://msbuildlog.com/)).
+My teammate @Martin_Balous was successfully researched the problem and found the ``MsBuild`` targets responsible for ``apphost`` creation. These targets are ``ResolveFrameworkReferences`` and ``_CreateAppHos``.
 This what @Martin wrote to me:
 
 >after long time of reverse engineering the binary logs...
@@ -407,13 +414,13 @@ Build succeeded.
 
 Time Elapsed 00:00:00.60
 ```
-Afther executing this command publish to linux works as expected.
+After executing this command publish to Linux works as expected.
 
 
 <h2>Final commands:</h2>
 
 
-Now it's time to go from the bedinning to the end and publish the application for windows and for linux withot rebuild it.
+Now it's time to go from the beginning to the end and publish the application for Windows and for Linux without rebuilding it.
 
 1) Remove folders
 ```sh
@@ -450,7 +457,7 @@ Build succeeded.
 Time Elapsed 00:00:00.50
 ```
 
-3. Restore nuget packages
+3. Restore NuGet packages
 ```sh
 dotnet restore  .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj -v n
 Build started 12/13/2024 5:53:46 PM.
@@ -562,9 +569,9 @@ Build succeeded.
 Time Elapsed 00:00:00.72
 ```
 
-6. Create apphost for linux
+6. Create apphost for Linux
 
-Only one apphost.exe wich is windows one
+Only one ``apphost.exe`` which is Windows one
 
 ```sh
 ls .\GenerateSelfSignedCertificate\obj\x64\Debug\net8.0\
@@ -592,7 +599,7 @@ d----          12/13/2024  6:04 PM                win-x64
 -a---          12/13/2024  6:04 PM            189 GenerateSelfSignedCertificate.sourcelink.json
 -a---          12/13/2024  6:06 PM            934 PublishOutputs.f16676fdf0.txt
 ```
-Let's call MsBuild target for creating apphost for linux.
+Let's call ``MsBuild`` target for creating ``apphost`` for Linux.
 
 ```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /p:Configuration=Debug /t:ResolveFrameworkReferences;_CreateAppHost /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n
@@ -619,7 +626,7 @@ Build succeeded.
 
 Time Elapsed 00:00:00.75
 ```
-Run ls one more time.
+Run ``ls`` one more time.
 
 ```sh
 ls .\GenerateSelfSignedCertificate\obj\x64\Debug\net8.0\
@@ -649,7 +656,7 @@ d----          12/13/2024  6:04 PM                win-x64
 -a---          12/13/2024  6:06 PM            934 PublishOutputs.f16676fdf0.txt
 ```
 
-Now we have 2 apphost files inside the same folder.
+Now we have 2 ``apphost`` files inside the same folder.
 
 7. Publish for Linux
 ```sh
@@ -686,7 +693,7 @@ Build succeeded.
 Time Elapsed 00:00:00.59
 ```
 
-8. Let's ensure that the appliaction works on windons and on linux
+8. Let's ensure that the application works on windons and on Linux
 ```sh
  .\GenerateSelfSignedCertificate\x64\Debug\publish_win\GenerateSelfSignedCertificate.exe      
 -----BEGIN RSA PUBLIC KEY-----
@@ -769,5 +776,5 @@ HcuVvwhpyJQWUkUDhKGh5rSvPfh4z5Nf1dfD6rS3c3rE0ud6IQ==
 
 <h2>worth mentioning:</h2>
 
-1) The solution above works for entreprise comples solutions.
-2) Conditional compilation is out of scope of this article.
+1. The solution above works for complex enterprise solutions.
+2. Conditional compilation is out of scope of this article.
