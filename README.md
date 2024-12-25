@@ -237,7 +237,7 @@ Time Elapsed 00:00:00.56
 As you can see ``CoreCompile`` target - the target responsible for compiling the source code files in a project - skipped cause the application is already compiled and no changes are needed.
 
 However, when the application is being published for 2 different ``RIDs`` ``Restore`` and ``CoreCompile`` targets are called twice - once per publish profile.
-In total ``Restore`` and ``CoreCompile`` targets are called 3 times - build\publish Windows\publish Linux.
+In total ``Restore`` and ``CoreCompile`` targets are called 3 times - for build\publish Windows\publish Linux.
 
 Let's look at ``dotnet build`` and ``dotnet publish`` cli documentation.
 ```
@@ -259,7 +259,7 @@ C:\Program Files\dotnet\sdk\8.0.403\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET
        dCertificate\GenerateSelfSignedCertificate.csproj]
 ```
 
-We need to assist ``MSBuild`` by specifying the output directory for the build binaries because it uses the wrong one, as indicated by the error message. The problem is that ``dotnet publish`` simply does not support specifying an output directory. It is possible to specify ``[-o|--output <OUTPUT_DIRECTORY>]`` for `dotnet publish`` but it is not what we want. This is merely the target location for our published binaries, whereas we need to assist ``MSBuild`` with specifying the source folder that contains the build binaries [dotnet publish does not set OutDir - issue](https://github.com/dotnet/sdk/issues/9012). So let's switch to ``MSBuild`` which allow that and much more.
+We need to assist ``MSBuild`` by specifying the output directory for the build binaries because it uses the wrong one, as indicated by the error message. The problem is that ``dotnet publish`` simply does not support specifying an output directory. It is possible to specify ``[-o|--output <OUTPUT_DIRECTORY>]`` for ``dotnet publish`` but it is not what we want. This is merely the target location for our published binaries, whereas we need to assist ``MSBuild`` with specifying the source folder that contains the build binaries [dotnet publish does not set OutDir - issue](https://github.com/dotnet/sdk/issues/9012). So let's switch to ``MSBuild`` which allow that and much more.
 ``MSBuild`` allows publishing without build and restore as well -  ``/p:RestorePackages=false /p:NoBuild=true``
 
 ```sh
