@@ -309,7 +309,7 @@ Time Elapsed 00:00:00.52
 ```
 
 Perfect, now it works!
-As you can see, the ``CoreCompile`` target was not called; the compilation was skipped. We’ve just published the app without restoring Nuget packages and without building during publish. (Or to put it differently, we restored ``NuGet`` packages and then built the app only once during the build itself, not during the publish process)
+As you can see, the ``CoreCompile`` target was not called; the compilation was skipped. We’ve just published the app without restoring Nuget packages and without building during publish (Or to put it differently, we restored ``NuGet`` packages and then built the app only once during the build itself, not during the publish process).
 
 Let's run publish for Linux.
 ```sh
@@ -361,7 +361,7 @@ Publishing for Linux now works as expected.
 
 However, the absence of ``apphost`` is not our desired solution. Let's delve a bit deeper. We have just demonstrated that ``apphost`` is the key obstacle preventing us from publishing for two different platforms using a single build and restore process. To address the ``apphost`` problem, we need to analyze the ``MSBuild`` output or the [binary log](https://learn.microsoft.com/en-us/visualstudio/msbuild/obtaining-build-logs-with-msbuild?view=vs-2022#save-a-binary-log)([MsBuild binary log viewer](https://msbuildlog.com/)).
 My teammate @Martin_Balous was successfully researched the problem and found the ``MsBuild`` targets responsible for ``apphost`` creation. These targets are ``ResolveFrameworkReferences`` and ``_CreateAppHos``.
-This what @Martin wrote to me:
+This what @Martin_Balous wrote to me:
 
 >after long time of reverse engineering the binary logs...
 ![screenshot](./imageFolder/apphost_investigation.png)
@@ -684,7 +684,7 @@ Time Elapsed 00:00:00.72
 
 6. Create apphost for Linux
 
-Only one ``apphost.exe`` which is Windows one
+Before createing ``apphost`` for linux, only one ``apphost.exe`` is present, which is Windows one.
 
 ```sh
 ls .\GenerateSelfSignedCertificate\obj\x64\Debug\net8.0\
@@ -741,7 +741,7 @@ Build succeeded.
 
 Time Elapsed 00:00:00.75
 ```
-Please note, that you might get the following error
+Please note, that you might get the following error:
 ```sh
 _CreateAppHost: The term '_CreateAppHost' is not recognized as a name of a cmdlet, function, script file, or executable program.
 Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
@@ -785,7 +785,7 @@ d----          12/13/2024  6:04 PM                win-x64
 -a---          12/13/2024  6:06 PM            934 PublishOutputs.f16676fdf0.txt
 ```
 
-Now we have 2 ``apphost`` files inside the same folder.
+Now we have 2 ``apphost`` files inside the same folder - one for Windows and another one for Linux.
 
 7. Publish for Linux
 ```sh
