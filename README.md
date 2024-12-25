@@ -9,7 +9,7 @@ The application is cross-platform, it utilizes the, it utilizes [System.Security
 
 Let's look at couple of important parts of ``.csproj`` file.
 
-I've explicitly set ``AppendTargetFrameworkToOutputPath`` and ``AppendRuntimeIdentifierToOutputPath`` to ``true`` to mirror build output structure. I've also explicitly specified multiple runtime identifiers reflecting that I'd like my app to work on both runtimes - ``win-x64`` and ``linux-x64``.
+I've explicitly set ``AppendTargetFrameworkToOutputPath`` and ``AppendRuntimeIdentifierToOutputPath`` to ``true`` to mirror build output structure. I've also explicitly specified multiple ``RIDs`` reflecting that I'd like my app to work on both runtimes - ``win-x64`` and ``linux-x64``.
 ```xml
 <OutputPath>$(Platform)\$(Configuration)</OutputPath>
 <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
