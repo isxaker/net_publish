@@ -1,10 +1,10 @@
 <h1>How to publish a project for Windows and Linux, using a single restore and build operation.</h1>
 
-In this article, I'd like to share how to publish a cross-platform .NET 8 application to both Windows and Linux using a single NuGet restore and a single build operation. I have not found any similar guides, so everything below is the result of my own research and that of my teammates. The final solution works and is being used in more complex applications than the one presented here. Any feedback is more than welcome.
+In this article, I'd like to share how to publish a cross-platform ``.NET 8`` application to both Windows and Linux using a single ``NuGet`` restore and a single build operation. I have not found any similar guides, so everything below is the result of my own research and that of my teammates. The final solution works and is being used in more complex applications than the one presented here. Any feedback is more than welcome.
 
 <h2>The project and how it is configured.</h2>
 
-Let's consider a simple .NET 8 console application that generates a self-signed certificate and writes the public and private keys to standard output in PEM format.
+Let's consider a simple ``.NET 8`` console application that generates a self-signed certificate and writes the public and private keys to standard output in PEM format.
 
 The application is cross-platform, it utilizes the, it utilizes [System.Security.Cryptography.ProtectedData](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/6.0.0)
 
@@ -33,7 +33,7 @@ There're 3 options for specifying ``RID`` for you project:
 1. no ``RID`` in ``csproj``
 2. single ``RID`` - ``<RuntimeIdentifier>win-x64</RuntimeIdentifier>``
 3. multiple ``RID`` - ``<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>``
-Honestly, you don't need to specify `RIDs` in multiple form because options 1 and 3 are equivalent. When no `RID` is specified or multiple `RIDs` are specified, .NET pulls all available runtimes for your project and copies them into a single build output folder. The `.deps.json` file is organized accordingly.
+Honestly, you don't need to specify `RIDs` in multiple form because options 1 and 3 are equivalent. When no `RID` is specified or multiple `RIDs` are specified, ``.NET`` pulls all available runtimes for your project and copies them into a single build output folder. The `.deps.json` file is organized accordingly.
 
 <details>
 <summary>GenerateSelfSignedCertificate.deps.json for multiple RIDs</summary>
@@ -189,7 +189,7 @@ C:\USERS\MBRYKSIN\DESKTOP\LINKEDIN\PUBLISH\PROJECT\NET_PUBLISH\GENERATESELFSIGNE
 
 Publishing helps generate only the necessary binaries for the target runtime.
 
-The usual or proper workflow to prepare a ready-to-use application involves restoring NuGet packages, building binaries, and then publishing them.
+The usual or proper workflow to prepare a ready-to-use application involves restoring ``NuGet`` packages, building binaries, and then publishing them.
 If we need our application to work on multiple platforms, we must perform all these steps twice - once for each platform.
 
 This is the most straightforward approach: if the process works for one ``RID``, we repeat the same steps for every other ``RIDs``.
@@ -208,9 +208,9 @@ dotnet publish .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csp
 However, if you examine the detailed ``MsBuild`` output for the command above, you will notice that ``Restore`` and ``CoreCompile`` targets are called 3 times - one for ``dotnet build``, one for ``dotnet publish`` for Windows and one more for ``dotnet publish`` for Linux.
 There are two questions we should ask ourselves:
 1. Why do we need to build our application more than once if the code is cross-platform?
-2. Why do we need to restore NuGet packages more than once if .NET consolidates all binaries and the runtimes folder into a single build output folder during builds for multiple ``RIDs``? (Assuming that Microsoft has allowed such behavior, it should be correct and supported)
+2. Why do we need to restore ``NuGet`` packages more than once if ``.NET`` consolidates all binaries and the runtimes folder into a single build output folder during builds for multiple ``RIDs``? (Assuming that Microsoft has allowed such behavior, it should be correct and supported)
 
-The assumption is that if the code is cross-platform, it can be built only once; hence, only a single NuGet restore is needed.
+The assumption is that if the code is cross-platform, it can be built only once; hence, only a single ``NuGet`` restore is needed.
 
 ``MsBuild`` is smart enough and if e.g. you run ``dotnet build`` 2 times in a row, multiple targets - if not all of them - will be skipped.
 Below is the output for the second build in a row for out project.
@@ -326,7 +326,7 @@ Time Elapsed 00:00:00.52
 ```
 
 Perfect, now it works!
-As you can see, the ``CoreCompile`` target was not called; the compilation was skipped. We’ve just published the app without restoring Nuget packages and without building during publish. (Or to put it differently, we restored NuGet packages and then built the app only once during the build itself, not during the publish process)
+As you can see, the ``CoreCompile`` target was not called; the compilation was skipped. We’ve just published the app without restoring Nuget packages and without building during publish. (Or to put it differently, we restored ``NuGet`` packages and then built the app only once during the build itself, not during the publish process)
 
 Let's run publish for Linux.
 ```sh
@@ -345,9 +345,9 @@ tificate.csproj]
 Time Elapsed 00:00:00.77
 ```
 
-We encountered an issue with ``apphost``. In .NET Core 3.0 and later, when you publish an application, an executable file - ``apphost`` - is created by default. This feature provides a platform-specific binary that allows you to run your application without needing to specify ``dotnet`` and the DLL name, simplifying the launch process.
+We encountered an issue with ``apphost``. In ``.NET Core 3.0`` and later, when you publish an application, an executable file - ``apphost`` - is created by default. This feature provides a platform-specific binary that allows you to run your application without needing to specify ``dotnet`` and the ``DLL`` name, simplifying the launch process.
 
-If you prefer to disable the creation of the ``apphost`` and follow the traditional approach of running your application using the ``dotnet`` command with your DLL, you can adjust your ``.csproj`` to do so. To disable ``apphost`` for your project, add ``<UseAppHost>false</UseAppHost>`` to the ``.csproj`` file.
+If you prefer to disable the creation of the ``apphost`` and follow the traditional approach of running your application using the ``dotnet`` command with your ``DLL``, you can adjust your ``.csproj`` to do so. To disable ``apphost`` for your project, add ``<UseAppHost>false</UseAppHost>`` to the ``.csproj`` file.
 
 By doing this, the ``apphost`` is not created for your executable, meaning you'll need to run the executable using ``dotnet``, which might not be convenient or even acceptable for certain scenarios.
 
