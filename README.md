@@ -168,7 +168,7 @@ More details about assembly resolution [here](https://github.com/dotnet/cli/blob
 I primarily use Windows so I just build the app and run it. It works from ``/x64/Debug/net8.0`` folder even without publish.
 And I can just switch from Windows to Linux and do the same - just build and run the application, it works without publish.
 
-<h2>Build and publish</h2>
+<h2>Build and publish.</h2>
 
 Our goal is to obtain binaries for both Windows and Linux. I have added two publish profiles, one for each ``RID``.
 
@@ -417,7 +417,7 @@ Time Elapsed 00:00:00.60
 After executing this command publish to Linux works as expected.
 
 
-<h2>Final commands:</h2>
+<h2>Final commands.</h2>
 
 
 Now it's time to go from the beginning to the end and publish the application for Windows and for Linux without rebuilding it.
@@ -425,6 +425,8 @@ Now it's time to go from the beginning to the end and publish the application fo
 1) Remove folders
 ```sh
 Remove-Item -Path .\GenerateSelfSignedCertificate\obj\, .\GenerateSelfSignedCertificate\x64\ -Recurse -Force
+```
+```sh
 ls .\GenerateSelfSignedCertificate\
 
     Directory: C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate
@@ -440,7 +442,8 @@ d----           11/2/2024  6:43 PM                Properties
 2) Clean project
 ```sh
 msbuild /t:clean .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj
-
+```
+```sh
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/13/2024 5:29:37 PM.
 
@@ -460,6 +463,8 @@ Time Elapsed 00:00:00.50
 3. Restore NuGet packages
 ```sh
 dotnet restore  .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj -v n
+```
+```sh
 Build started 12/13/2024 5:53:46 PM.
      1>Project "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj" on node 1 (Restore target(s)).
      1>_GetAllRestoreProjectPathItems:
@@ -487,10 +492,6 @@ Build started 12/13/2024 5:53:46 PM.
 
          Feeds used:
              https://api.nuget.org/v3/index.json
-             https://artifactory.rd.veeam.dev/artifactory/api/nuget/nuget-group
-             C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\
-             C:\local
-             https://tfs.veeam.dev/DefaultCollection/ExchangeExplorer/_packaging/internal-nugets/nuget/v3/index.json
      1>Done Building Project "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj" (Restore target( 
        s)).
 
@@ -503,9 +504,11 @@ Time Elapsed 00:00:00.92
 
 4. Build project
 ```sh
-msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /p:Configuration=Debug
+msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /p:Configuration=Debug /p:RestorePackages=false
+```
+```sh
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
-Build started 12/13/2024 5:20:17 PM.
+Build started 12/25/2024 6:08:23 PM.
 
 Project "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj" on node 1 (default targets).
 GenerateTargetFrameworkMonikerAttribute:
@@ -513,33 +516,162 @@ Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output fil
 CoreGenerateAssemblyInfo:
 Skipping target "CoreGenerateAssemblyInfo" because all output files are up-to-date with respect to the input files.
 _GenerateSourceLinkFile:
-  Source Link file 'obj\x64\Debug\net8.0\GenerateSelfSignedCertificate.sourcelink.json' is up-to-date.
+  Updating Source Link file 'obj\x64\Debug\net8.0\GenerateSelfSignedCertificate.sourcelink.json'.
 CoreCompile:
-Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
-_CreateAppHost:
-Skipping target "_CreateAppHost" because all output files are up-to-date with respect to the input files.
+  C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\Roslyn\csc.exe /noconfig /unsafe- /checked- /nowarn:1701,1702,1701,1702 /fullpaths /nostdlib+ /platform:x6 
+  4 /errorreport:prompt /warn:8 /define:TRACE;DEBUG;NET;NET8_0;NETCOREAPP;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP1_0_OR_GREATER;NETCOREAPP1_1_OR 
+  _GREATER;NETCOREAPP2_0_OR_GREATER;NETCOREAPP2_1_OR_GREATER;NETCOREAPP2_2_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER /highentropyva+ /reference:"C:\Program Files\dotnet 
+  \packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\Microsoft.CSharp.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\Microsoft.VisualBasic.Core 
+  .dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\Microsoft.VisualBasic.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Re 
+  f\8.0.10\ref\net8.0\Microsoft.Win32.Primitives.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\Microsoft.Win32.Registry.dll" /reference:"C:\Pr 
+  ogram Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\mscorlib.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\netstandard.dll" 
+   /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.AppContext.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ 
+  ref\net8.0\System.Buffers.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Collections.Concurrent.dll" /reference:"C:\Program Files\dotn 
+  et\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Collections.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Collections.Imm 
+  utable.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Collections.NonGeneric.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft. 
+  NETCore.App.Ref\8.0.10\ref\net8.0\System.Collections.Specialized.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.ComponentModel.Annotat 
+  ions.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.ComponentModel.DataAnnotations.dll" /reference:"C:\Program Files\dotnet\packs\Micr 
+  osoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.ComponentModel.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.ComponentModel.EventBased 
+  Async.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.ComponentModel.Primitives.dll" /reference:"C:\Program Files\dotnet\packs\Microsof 
+  t.NETCore.App.Ref\8.0.10\ref\net8.0\System.ComponentModel.TypeConverter.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Configuration.d 
+  ll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Console.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ 
+  ref\net8.0\System.Core.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Data.Common.dll" /reference:"C:\Program Files\dotnet\packs\Micro 
+  soft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Data.DataSetExtensions.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Data.dll" /referen 
+  ce:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Diagnostics.Contracts.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.1 
+  0\ref\net8.0\System.Diagnostics.Debug.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Diagnostics.DiagnosticSource.dll" /reference:"C:\ 
+  Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Diagnostics.FileVersionInfo.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10 
+  \ref\net8.0\System.Diagnostics.Process.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Diagnostics.StackTrace.dll" /reference:"C:\Progr 
+  am Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Diagnostics.TextWriterTraceListener.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0 
+  .10\ref\net8.0\System.Diagnostics.Tools.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Diagnostics.TraceSource.dll" /reference:"C:\Pro 
+  gram Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Diagnostics.Tracing.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0 
+  \System.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Drawing.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Re 
+  f\8.0.10\ref\net8.0\System.Drawing.Primitives.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Dynamic.Runtime.dll" /reference:"C:\Progr 
+  am Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Formats.Asn1.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.F 
+  ormats.Tar.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Globalization.Calendars.dll" /reference:"C:\Program Files\dotnet\packs\Micro 
+  soft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Globalization.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Globalization.Extensions.dl 
+  l" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.IO.Compression.Brotli.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.Ap 
+  p.Ref\8.0.10\ref\net8.0\System.IO.Compression.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.IO.Compression.FileSystem.dll" /reference 
+  :"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.IO.Compression.ZipFile.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10 
+  \ref\net8.0\System.IO.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.IO.FileSystem.AccessControl.dll" /reference:"C:\Program Files\dot 
+  net\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.IO.FileSystem.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.IO.FileSyste 
+  m.DriveInfo.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.IO.FileSystem.Primitives.dll" /reference:"C:\Program Files\dotnet\packs\Mic 
+  rosoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.IO.FileSystem.Watcher.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.IO.IsolatedStorag 
+  e.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.IO.MemoryMappedFiles.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore 
+  .App.Ref\8.0.10\ref\net8.0\System.IO.Pipes.AccessControl.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.IO.Pipes.dll" /reference:"C:\P 
+  rogram Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.IO.UnmanagedMemoryStream.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref 
+  \net8.0\System.Linq.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Linq.Expressions.dll" /reference:"C:\Program Files\dotnet\packs\Mic 
+  rosoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Linq.Parallel.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Linq.Queryable.dll" /refe 
+  rence:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Memory.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0 
+  \System.Net.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net.Http.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.A 
+  pp.Ref\8.0.10\ref\net8.0\System.Net.Http.Json.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net.HttpListener.dll" /reference:"C:\Prog 
+  ram Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net.Mail.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net. 
+  NameResolution.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net.NetworkInformation.dll" /reference:"C:\Program Files\dotnet\packs\Mi 
+  crosoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net.Ping.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net.Primitives.dll" /referenc 
+  e:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net.Quic.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\S 
+  ystem.Net.Requests.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net.Security.dll" /reference:"C:\Program Files\dotnet\packs\Microsof 
+  t.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net.ServicePoint.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net.Sockets.dll" /reference 
+  :"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net.WebClient.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8 
+  .0\System.Net.WebHeaderCollection.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net.WebProxy.dll" /reference:"C:\Program Files\dotnet 
+  \packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net.WebSockets.Client.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Net.Web 
+  Sockets.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Numerics.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.R 
+  ef\8.0.10\ref\net8.0\System.Numerics.Vectors.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.ObjectModel.dll" /reference:"C:\Program Fi 
+  les\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Reflection.DispatchProxy.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\S 
+  ystem.Reflection.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Reflection.Emit.dll" /reference:"C:\Program Files\dotnet\packs\Microso 
+  ft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Reflection.Emit.ILGeneration.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Reflection.Emi 
+  t.Lightweight.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Reflection.Extensions.dll" /reference:"C:\Program Files\dotnet\packs\Micr 
+  osoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Reflection.Metadata.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Reflection.Primitive 
+  s.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Reflection.TypeExtensions.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NE 
+  TCore.App.Ref\8.0.10\ref\net8.0\System.Resources.Reader.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Resources.ResourceManager.dll"  
+  /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Resources.Writer.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8. 
+  0.10\ref\net8.0\System.Runtime.CompilerServices.Unsafe.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Runtime.CompilerServices.VisualC 
+  .dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Runtime.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.1 
+  0\ref\net8.0\System.Runtime.Extensions.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Runtime.Handles.dll" /reference:"C:\Program File 
+  s\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Runtime.InteropServices.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\Syst 
+  em.Runtime.InteropServices.JavaScript.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Runtime.InteropServices.RuntimeInformation.dll" / 
+  reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Runtime.Intrinsics.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8 
+  .0.10\ref\net8.0\System.Runtime.Loader.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Runtime.Numerics.dll" /reference:"C:\Program Fil 
+  es\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Runtime.Serialization.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\Syste 
+  m.Runtime.Serialization.Formatters.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Runtime.Serialization.Json.dll" /reference:"C:\Progr 
+  am Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Runtime.Serialization.Primitives.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10 
+  \ref\net8.0\System.Runtime.Serialization.Xml.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Security.AccessControl.dll" /reference:"C: 
+  \Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Security.Claims.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0 
+  \System.Security.Cryptography.Algorithms.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Security.Cryptography.Cng.dll" /reference:"C:\ 
+  Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Security.Cryptography.Csp.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\r 
+  ef\net8.0\System.Security.Cryptography.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Security.Cryptography.Encoding.dll" /reference:" 
+  C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Security.Cryptography.OpenSsl.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8 
+  .0.10\ref\net8.0\System.Security.Cryptography.Primitives.dll" /reference:C:\Users\mbryksin\.nuget\packages\system.security.cryptography.protecteddata\6.0.0\lib\net6.0\System.Security.Cr 
+  yptography.ProtectedData.dll /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Security.Cryptography.X509Certificates.dll" /reference:"C:\Prog 
+  ram Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Security.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Secu 
+  rity.Principal.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Security.Principal.Windows.dll" /reference:"C:\Program Files\dotnet\pack 
+  s\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Security.SecureString.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.ServiceModel 
+  .Web.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.ServiceProcess.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.Ap 
+  p.Ref\8.0.10\ref\net8.0\System.Text.Encoding.CodePages.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Text.Encoding.dll" /reference:"C 
+  :\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Text.Encoding.Extensions.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ 
+  ref\net8.0\System.Text.Encodings.Web.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Text.Json.dll" /reference:"C:\Program Files\dotnet 
+  \packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Text.RegularExpressions.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Threa 
+  ding.Channels.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Threading.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCor 
+  e.App.Ref\8.0.10\ref\net8.0\System.Threading.Overlapped.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Threading.Tasks.Dataflow.dll" / 
+  reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Threading.Tasks.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0. 
+  10\ref\net8.0\System.Threading.Tasks.Extensions.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Threading.Tasks.Parallel.dll" /referenc 
+  e:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Threading.Thread.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\ 
+  net8.0\System.Threading.ThreadPool.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Threading.Timer.dll" /reference:"C:\Program Files\do 
+  tnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Transactions.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Transactions 
+  .Local.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.ValueTuple.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App. 
+  Ref\8.0.10\ref\net8.0\System.Web.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Web.HttpUtility.dll" /reference:"C:\Program Files\dotn 
+  et\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Windows.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Xml.dll" /reference 
+  :"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Xml.Linq.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\Sy 
+  stem.Xml.ReaderWriter.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Xml.Serialization.dll" /reference:"C:\Program Files\dotnet\packs\ 
+  Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Xml.XDocument.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Xml.XmlDocument.dll" / 
+  reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Xml.XmlSerializer.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8. 
+  0.10\ref\net8.0\System.Xml.XPath.dll" /reference:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\System.Xml.XPath.XDocument.dll" /reference:"C:\Program Files\ 
+  dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\ref\net8.0\WindowsBase.dll" /debug+ /debug:portable /filealign:512 /optimize- /out:obj\x64\Debug\net8.0\GenerateSelfSignedCertificate.dll / 
+  refout:obj\x64\Debug\net8.0\refint\GenerateSelfSignedCertificate.dll /target:exe /warnaserror+ /utf8output /deterministic+ /sourcelink:obj\x64\Debug\net8.0\GenerateSelfSignedCertificate 
+  .sourcelink.json /langversion:latest /embed:"obj\x64\Debug\net8.0\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs" /embed:obj\x64\Debug\net8.0\GenerateSelfSignedCertificate.AssemblyInfo. 
+  cs /analyzerconfig:obj\x64\Debug\net8.0\GenerateSelfSignedCertificate.GeneratedMSBuildEditorConfig.editorconfig /analyzerconfig:"C:\Program Files\dotnet\sdk\8.0.403\Sdks\Microsoft.NET.S 
+  dk\analyzers\build\config\analysislevel_8_default.globalconfig" /analyzer:"C:\Program Files\dotnet\sdk\8.0.403\Sdks\Microsoft.NET.Sdk\targets\..\analyzers\Microsoft.CodeAnalysis.CSharp. 
+  NetAnalyzers.dll" /analyzer:"C:\Program Files\dotnet\sdk\8.0.403\Sdks\Microsoft.NET.Sdk\targets\..\analyzers\Microsoft.CodeAnalysis.NetAnalyzers.dll" /analyzer:"C:\Program Files\dotnet\ 
+  packs\Microsoft.NETCore.App.Ref\8.0.10\analyzers/dotnet/cs/Microsoft.Interop.ComInterfaceGenerator.dll" /analyzer:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\analyze 
+  rs/dotnet/cs/Microsoft.Interop.JavaScript.JSImportGenerator.dll" /analyzer:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\analyzers/dotnet/cs/Microsoft.Interop.LibraryI 
+  mportGenerator.dll" /analyzer:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\analyzers/dotnet/cs/Microsoft.Interop.SourceGeneration.dll" /analyzer:"C:\Program Files\dot 
+  net\packs\Microsoft.NETCore.App.Ref\8.0.10\analyzers/dotnet/cs/System.Text.Json.SourceGeneration.dll" /analyzer:"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.10\analyzers 
+  /dotnet/cs/System.Text.RegularExpressions.Generator.dll" Program.cs "obj\x64\Debug\net8.0\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs" obj\x64\Debug\net8.0\GenerateSelfSignedCertific 
+  ate.AssemblyInfo.cs /warnaserror+:NU1605,SYSLIB0011
+  CompilerServer: server - server processed compilation - GenerateSelfSignedCertificate (net8.0)
+_CopyFilesMarkedCopyLocal:
+  Copying file from "C:\Users\mbryksin\.nuget\packages\system.security.cryptography.protecteddata\6.0.0\lib\net6.0\System.Security.Cryptography.ProtectedData.dll" to "C:\Users\mbryksin\De 
+  sktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\x64\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll".
+  Creating directory "x64\Debug\net8.0\runtimes\win\lib\net6.0".
+  Copying file from "C:\Users\mbryksin\.nuget\packages\system.security.cryptography.protecteddata\6.0.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll" to "C:\User 
+  s\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\x64\Debug\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll".
+  Creating "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\obj\x64\Debug\net8.0\Generate.0DD12D91.Up2Date" because "AlwaysCreate" was specifi
+  ed.
+  Touching "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\obj\x64\Debug\net8.0\Generate.0DD12D91.Up2Date".
 _CopyOutOfDateSourceItemsToOutputDirectory:
-Skipping target "_CopyOutOfDateSourceItemsToOutputDirectory" because all output files are up-to-date with respect to the input files.
-GenerateBuildDependencyFile:
-Skipping target "GenerateBuildDependencyFile" because all output files are up-to-date with respect to the input files.
-GenerateBuildRuntimeConfigurationFiles:
-Skipping target "GenerateBuildRuntimeConfigurationFiles" because all output files are up-to-date with respect to the input files.
+  Copying file from "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\obj\x64\Debug\net8.0\apphost.exe" to "C:\Users\mbryksin\Desktop\linkedIn\ 
+  publish\Project\net_publish\GenerateSelfSignedCertificate\x64\Debug\net8.0\GenerateSelfSignedCertificate.exe".
 CopyFilesToOutputDirectory:
-  GenerateSelfSignedCertificate -> C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\x64\Debug\net8.0\GenerateSelfSignedCertificate.dl 
-  l
-Done Building Project "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj" (default targets).      
+  Copying file from "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\obj\x64\Debug\net8.0\GenerateSelfSignedCertificate.dll" to "C:\Users\mbry 
+  ksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\x64\Debug\net8.0\GenerateSelfSignedCertificate.dll".
+  Copying reference assembly from "obj\x64\Debug\net8.0\refint\GenerateSelfSignedCertificate.dll" to "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCert 
+  ificate\obj\x64\Debug\net8.0\ref\GenerateSelfSignedCertificate.dll".
+  GenerateSelfSignedCertificate -> C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\x64\Debug\net8.0\GenerateSelfSignedCertificate.dll
+  Copying file from "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\obj\x64\Debug\net8.0\GenerateSelfSignedCertificate.pdb" to "C:\Users\mbry 
+  ksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\x64\Debug\net8.0\GenerateSelfSignedCertificate.pdb".
+Done Building Project "C:\Users\mbryksin\Desktop\linkedIn\publish\Project\net_publish\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj" (default targets).
 
 
 Build succeeded.
     0 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:00.78
+Time Elapsed 00:00:02.89
 ```
 
 5. Publish for Windows
 ```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n
+```
+```sh
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/13/2024 6:06:04 PM.
 
@@ -603,6 +735,8 @@ Let's call ``MsBuild`` target for creating ``apphost`` for Linux.
 
 ```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /p:Configuration=Debug /t:ResolveFrameworkReferences;_CreateAppHost /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n
+```
+```sh
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/13/2024 6:07:53 PM.
 
@@ -626,6 +760,20 @@ Build succeeded.
 
 Time Elapsed 00:00:00.75
 ```
+Please note, that you might get the following error
+```sh
+_CreateAppHost: The term '_CreateAppHost' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+```
+If so just run the same command but using VS Command Prompt.
+
+```sh
+**********************************************************************
+** Visual Studio 2022 Developer Command Prompt v17.11.5
+** Copyright (c) 2022 Microsoft Corporation
+**********************************************************************
+```
+
 Run ``ls`` one more time.
 
 ```sh
@@ -661,6 +809,8 @@ Now we have 2 ``apphost`` files inside the same folder.
 7. Publish for Linux
 ```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n   
+```
+```sh
 MSBuild version 17.11.9+a69bbaaf5 for .NET Framework
 Build started 12/13/2024 6:09:39 PM.
 
@@ -774,7 +924,7 @@ HcuVvwhpyJQWUkUDhKGh5rSvPfh4z5Nf1dfD6rS3c3rE0ud6IQ==
 -----END RSA PRIVATE KEY-----
 ```
 
-<h2>worth mentioning:</h2>
+<h2>worth mentioning.</h2>
 
 1. The solution above works for complex enterprise solutions.
 2. Conditional compilation is out of scope of this article.
