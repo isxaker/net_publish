@@ -4,13 +4,13 @@
 - [Motivation](#purpose)
 - [The project and how it is configured](#project)
 - [Build and publish](#build)
-    -[Apphost](#apphost)
+    - [Apphost](#apphost)
 - [Final commands](#final)
 
 ## Purpose
 In this article, I'd like to share how to publish a cross-platform ``.NET 8`` application to both Windows and Linux using a single ``NuGet`` restore and a single ``MsBuild`` operation. I have not found any similar guide, so everything below is the result of my own research and that of my teammates. The final solution works and is being used in more complex applications than the one presented here. Any feedback is more than welcome.
 
-## project
+## Project
 The project and how it is configured.
 
 Let's consider a simple ``.NET 8`` console application that generates a self-signed certificate and writes the public and private keys to standard output in PEM format.
