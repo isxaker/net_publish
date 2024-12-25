@@ -1,10 +1,10 @@
 <h1>How to publish a project for Windows and Linux, using a single restore and build operation.</h1>
 
 ## Contents
-- [Motivationd](#purpose)
+- [Motivation](#purpose)
 - [The project and how it is configured](#project)
 - [Build and publish](#build)
-    [Apphost](#apphost)
+    -[Apphost](#apphost)
 - [Final commands](#final)
 
 ## Purpose
