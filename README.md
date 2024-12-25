@@ -36,7 +36,7 @@ There're 3 options for specifying ``RID`` for you project:
 Honestly, you don't need to specify `RIDs` in multiple form because options 1 and 3 are equivalent. When no `RID` is specified or multiple `RIDs` are specified, .NET pulls all available runtimes for your project and copies them into a single build output folder. The `.deps.json` file is organized accordingly.
 
 <details>
-<summary>``GenerateSelfSignedCertificate.deps.json`` for multiple ``RIDs``</summary>
+<summary>GenerateSelfSignedCertificate.deps.json for multiple RIDs</summary>
 
 ```json
 {
@@ -112,7 +112,7 @@ Mode                 LastWriteTime         Length Name
 ```
 
 <details>
-<summary>``GenerateSelfSignedCertificate.deps.json`` for single ``RID``</summary>
+<summary>GenerateSelfSignedCertificate.deps.json for single RID</summary>
 
 ```json
 {
