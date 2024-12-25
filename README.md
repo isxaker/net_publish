@@ -1,8 +1,17 @@
 <h1>How to publish a project for Windows and Linux, using a single restore and build operation.</h1>
 
+## Contents
+- [Motivationd](#purpose)
+- [The project and how it is configured](#project)
+- [Build and publish](#build)
+    [Apphost](#apphost)
+- [Final commands](#final)
+
+## Purpose
 In this article, I'd like to share how to publish a cross-platform ``.NET 8`` application to both Windows and Linux using a single ``NuGet`` restore and a single ``MsBuild`` operation. I have not found any similar guide, so everything below is the result of my own research and that of my teammates. The final solution works and is being used in more complex applications than the one presented here. Any feedback is more than welcome.
 
-<h2>The project and how it is configured.</h2>
+## project
+The project and how it is configured.
 
 Let's consider a simple ``.NET 8`` console application that generates a self-signed certificate and writes the public and private keys to standard output in PEM format.
 The application is cross-platform, it utilizes the, it utilizes [System.Security.Cryptography.ProtectedData](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/6.0.0)
@@ -163,7 +172,7 @@ More details about assembly resolution [here](https://github.com/dotnet/cli/blob
 
 I primarily use Windows so I just build the app and run it. It works from ``/x64/Debug/net8.0`` folder even without publish. And I can just switch from Windows to Linux and do the same - just build and run the application, it works without publish.
 
-<h2>Build and publish.</h2>
+## Build
 
 Our goal is to obtain binaries for both Windows and Linux. I have added two publish profiles, one for each ``RID``.
 
@@ -311,7 +320,7 @@ Time Elapsed 00:00:00.52
 Perfect, now it works!
 As you can see, the ``CoreCompile`` target was not called; the compilation was skipped. We’ve just published the app without restoring Nuget packages and without building during publish (Or to put it differently, we restored ``NuGet`` packages and then built the app only once during the build itself, not during the publish process).
 
-##AppHost
+## AppHost
 Let's run publish for Linux.
 ```sh
 msbuild .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj /t:publish /p:RestorePackages=false /p:NoBuild=true /p:PublishProfile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_linux.pubxml /p:OutDir=.\x64\Debug\net8.0 /p:AppendRuntimeIdentifierToOutputPath=false -v:n
@@ -399,7 +408,7 @@ Time Elapsed 00:00:00.60
 After executing this command publish to Linux works as expected.
 
 
-<h2>Final commands.</h2>
+## Final
 
 
 Now it's time to go from the beginning to the end and publish the application for Windows and for Linux without rebuilding it.
