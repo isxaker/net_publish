@@ -16,7 +16,7 @@ I've explicitly set ``AppendTargetFrameworkToOutputPath`` and ``AppendRuntimeIde
 <AppendRuntimeIdentifierToOutputPath>true</AppendRuntimeIdentifierToOutputPath>
 <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
 ```
-Build output folder is ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``. Obj folder location reflects these settings too ``./GenerateSelfSignedCertificate\obj\x64\Debug\net8.0`` Now, it is possible to build and run the application on the same platform — whether ``win-64`` or ``linux-x64`` — from a single folder - ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``
+Build output folder is ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``. Obj folder location reflects these settings too ``./GenerateSelfSignedCertificate\obj\x64\Debug\net8.0``. Now, it is possible to build and run the application on the same platform - whether ``win-64`` or ``linux-x64`` - from a single folder - ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``
 
 The runtimes folder is located in the build output directory, and the universal ``System.Security.Cryptography.ProtectedData.dll`` is placed in the root of the build output folder.
 ```sh
@@ -197,9 +197,9 @@ dotnet publish .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csp
 However, if you examine the detailed ``MsBuild`` output for the command above, you will notice that ``Restore`` and ``CoreCompile`` targets are called 3 times - one for ``dotnet build``, one for ``dotnet publish`` for Windows and one more for ``dotnet publish`` for Linux.
 There are two questions we should ask ourselves:
 1. Why do we need to build our application more than once if the code is cross-platform?
-2. Why do we need to restore ``NuGet`` packages more than once if ``.NET`` consolidates all binaries and the runtimes folder into a single build output folder during builds for multiple ``RIDs``? (Assuming that Microsoft has allowed such behavior, it should be correct and supported)
+2. Why do we need to restore ``NuGet`` packages more than once if ``.NET`` consolidates all binaries and the runtimes folder into a single build output folder during a build for multiple ``RIDs``? (Assuming that Microsoft has allowed such behavior, it should be correct and supported)
 
-The assumption is that if the code is cross-platform, it can be built only once; hence, only a single ``NuGet`` restore is needed.
+**The assumption is that if the code is cross-platform, it can be built only once; hence, only a single ``NuGet`` restore is needed.**
 
 ``MsBuild`` is smart enough and if e.g. you run ``dotnet build`` 2 times in a row, multiple targets - if not all of them - will be skipped.
 Below is the output for the second build in a row for out project.
