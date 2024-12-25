@@ -5,22 +5,18 @@ In this article, I'd like to share how to publish a cross-platform ``.NET 8`` ap
 <h2>The project and how it is configured.</h2>
 
 Let's consider a simple ``.NET 8`` console application that generates a self-signed certificate and writes the public and private keys to standard output in PEM format.
-
 The application is cross-platform, it utilizes the, it utilizes [System.Security.Cryptography.ProtectedData](https://www.nuget.org/packages/System.Security.Cryptography.ProtectedData/6.0.0)
 
 Let's look at couple of important parts of ``.csproj`` file.
 
-I've explicitly set ``AppendTargetFrameworkToOutputPath`` and ``AppendRuntimeIdentifierToOutputPath`` to ``true`` to mirror build output structure.
-I've also explicitly specified multiple runtime identifiers reflecting that I'd like my app to work on both runtimes - ``win-x64`` and ``linux-x64``.
+I've explicitly set ``AppendTargetFrameworkToOutputPath`` and ``AppendRuntimeIdentifierToOutputPath`` to ``true`` to mirror build output structure. I've also explicitly specified multiple runtime identifiers reflecting that I'd like my app to work on both runtimes - ``win-x64`` and ``linux-x64``.
 ```xml
 <OutputPath>$(Platform)\$(Configuration)</OutputPath>
 <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
 <AppendRuntimeIdentifierToOutputPath>true</AppendRuntimeIdentifierToOutputPath>
 <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
 ```
-Build output folder is ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``.
-Obj folder location reflects these settings too ``./GenerateSelfSignedCertificate\obj\x64\Debug\net8.0``
-Now, it is possible to build and run the application on the same platform — whether ``win-64`` or ``linux-x64`` — from a single folder - ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``
+Build output folder is ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``. Obj folder location reflects these settings too ``./GenerateSelfSignedCertificate\obj\x64\Debug\net8.0`` Now, it is possible to build and run the application on the same platform — whether ``win-64`` or ``linux-x64`` — from a single folder - ``./GenerateSelfSignedCertificate/x64/Debug/net8.0/``
 
 The runtimes folder is located in the build output directory, and the universal ``System.Security.Cryptography.ProtectedData.dll`` is placed in the root of the build output folder.
 ```sh
@@ -165,8 +161,7 @@ We can omit the details about the ``deps.json`` file and its content since all o
 
 More details about assembly resolution [here](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md) and [here](https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/specs/corehost.md#assembly-resolution).
 
-I primarily use Windows so I just build the app and run it. It works from ``/x64/Debug/net8.0`` folder even without publish.
-And I can just switch from Windows to Linux and do the same - just build and run the application, it works without publish.
+I primarily use Windows so I just build the app and run it. It works from ``/x64/Debug/net8.0`` folder even without publish. And I can just switch from Windows to Linux and do the same - just build and run the application, it works without publish.
 
 <h2>Build and publish.</h2>
 
@@ -187,14 +182,8 @@ C:\USERS\MBRYKSIN\DESKTOP\LINKEDIN\PUBLISH\PROJECT\NET_PUBLISH\GENERATESELFSIGNE
             FolderProfile_windows.pubxml
 ```
 
-Publishing helps generate only the necessary binaries for the target runtime.
-
-The usual or proper workflow to prepare a ready-to-use application involves restoring ``NuGet`` packages, building binaries, and then publishing them.
-If we need our application to work on multiple platforms, we must perform all these steps twice - once for each platform.
-
-This is the most straightforward approach: if the process works for one ``RID``, we repeat the same steps for every other ``RIDs``.
-This approach is correct and ensures everything functions properly.
-It's even the default behavior when building and publishing using the Visual Studio UI.
+Publishing helps generate only the necessary binaries for the target runtime. The usual or proper workflow to prepare a ready-to-use application involves restoring ``NuGet`` packages, building binaries, and then publishing them. If we need our application to work on multiple platforms, we must perform all these steps twice - once for each platform.
+This is the most straightforward approach: if the process works for one ``RID``, we repeat the same steps for every other ``RIDs``. This approach is correct and ensures everything functions properly. It's even the default behavior when building and publishing using the Visual Studio UI.
 
 These are the commands used for successful publishing the application for Windows and Linux.
 
@@ -259,8 +248,7 @@ dotnet publish [--no-build] [--no-restore]
 <br>
 [dotnet-build](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build)
 
-The documentation seems to support our assumption. Microsoft allows building without restoring, and publishing without building and/or restoring.
-How to publish without exta restore and without extra build? Let's try ``dotnet publish`` first.
+The documentation seems to support our assumption. Microsoft allows building without restoring, and publishing without building and/or restoring. How to publish without exta restore and without extra build? Let's try ``dotnet publish`` first.
 
 ```sh
 dotnet publish --no-restore --no-build .\GenerateSelfSignedCertificate\GenerateSelfSignedCertificate.csproj -p:publishprofile=.\GenerateSelfSignedCertificate\Properties\PublishProfiles\FolderProfile_windows.pubxml -c Debug -v n
@@ -271,12 +259,7 @@ C:\Program Files\dotnet\sdk\8.0.403\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET
        dCertificate\GenerateSelfSignedCertificate.csproj]
 ```
 
-We need to assist ``MSBuild`` by specifying the output directory for the build binaries because it uses the wrong one, as indicated by the error message.
-The problem is that ``dotnet publish`` simply does not support specifying an output directory.
-It is possible to specify ``[-o|--output <OUTPUT_DIRECTORY>]`` for `dotnet publish`` but it is not what we want.
-This is merely the target location for our published binaries, whereas we need to assist ``MSBuild`` with specifying the source folder that contains the build binaries.
-[dotnet publish does not set OutDir - issue](https://github.com/dotnet/sdk/issues/9012)
-So let's switch to ``MSBuild`` which allow that and much more.
+We need to assist ``MSBuild`` by specifying the output directory for the build binaries because it uses the wrong one, as indicated by the error message. The problem is that ``dotnet publish`` simply does not support specifying an output directory. It is possible to specify ``[-o|--output <OUTPUT_DIRECTORY>]`` for `dotnet publish`` but it is not what we want. This is merely the target location for our published binaries, whereas we need to assist ``MSBuild`` with specifying the source folder that contains the build binaries [dotnet publish does not set OutDir - issue](https://github.com/dotnet/sdk/issues/9012). So let's switch to ``MSBuild`` which allow that and much more.
 ``MSBuild`` allows publishing without build and restore as well -  ``/p:RestorePackages=false /p:NoBuild=true``
 
 ```sh
@@ -347,9 +330,7 @@ Time Elapsed 00:00:00.77
 
 We encountered an issue with ``apphost``. In ``.NET Core 3.0`` and later, when you publish an application, an executable file - ``apphost`` - is created by default. This feature provides a platform-specific binary that allows you to run your application without needing to specify ``dotnet`` and the ``DLL`` name, simplifying the launch process.
 
-If you prefer to disable the creation of the ``apphost`` and follow the traditional approach of running your application using the ``dotnet`` command with your ``DLL``, you can adjust your ``.csproj`` to do so. To disable ``apphost`` for your project, add ``<UseAppHost>false</UseAppHost>`` to the ``.csproj`` file.
-
-By doing this, the ``apphost`` is not created for your executable, meaning you'll need to run the executable using ``dotnet``, which might not be convenient or even acceptable for certain scenarios.
+If you prefer to disable the creation of the ``apphost`` and follow the traditional approach of running your application using the ``dotnet`` command with your ``DLL``, you can adjust your ``.csproj`` to do so. To disable ``apphost`` for your project, add ``<UseAppHost>false</UseAppHost>`` to the ``.csproj`` file. By doing this, the ``apphost`` is not created for your executable, meaning you'll need to run the executable using ``dotnet``, which might not be convenient or even acceptable for certain scenarios.
 
 Let's disable ``apphost`` creation and run the previous command once again.
 
