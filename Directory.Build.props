@@ -1,0 +1,9 @@
+<Project>
+  <!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
+  <PropertyGroup>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+    <!-- Workaround for bug in SDK - https://github.com/dotnet/sdk/issues/12114 -->
+    <IntermediateOutputPath>$(ArtifactsPath)/obj/$(MSBuildProjectName)/$(Configuration)/</IntermediateOutputPath>
+    <OutputPath>$(ArtifactsPath)/bin/$(MSBuildProjectName)/$(Configuration)/</OutputPath>
+  </PropertyGroup>
+</Project>

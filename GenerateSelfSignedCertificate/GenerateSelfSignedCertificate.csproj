@@ -1,25 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <Platform>x64</Platform>
-        <Platforms>$(Platform)</Platforms>
-        <PlatformTarget>$(Platform)</PlatformTarget>
-        <OutputPath>$(Platform)\$(Configuration)</OutputPath>
-
         <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
-
-        <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
-        <AppendRuntimeIdentifierToOutputPath>true</AppendRuntimeIdentifierToOutputPath>
-
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <LangVersion>latest</LangVersion>
         <SelfContained>false</SelfContained>
+        <_UpdateAppHostForPublish>true</_UpdateAppHostForPublish>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="6.0.0" />
     </ItemGroup>
 
+  <Import Project="../PublishAllRids.targets" />
 </Project>
