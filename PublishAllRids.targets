@@ -17,10 +17,6 @@
       <ProjectToPublish Include="@(RuntimeIdentifierForPublish->'$(MSBuildProjectFullPath)')">
         <AdditionalProperties>
           RuntimeIdentifier=%(RuntimeIdentifierForPublish.Identity)
-          ;NoBuild=true
-          ;OutputPath=$(OutputPath)
-          ;IntermediateOutputPath=$(IntermediateOutputPath)
-          ;_UpdateAppHostForPublish=true
         </AdditionalProperties>
       </ProjectToPublish>
     </ItemGroup>
