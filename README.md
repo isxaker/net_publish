@@ -408,7 +408,7 @@ Time Elapsed 00:00:00.60
 After executing this command publish to Linux works as expected.
 
 
-## Final
+## Final commands
 
 
 Now it's time to go from the beginning to the end and publish the application for Windows and for Linux without rebuilding it.
